@@ -38,6 +38,8 @@ public class UserSettings implements Serializable {
 	private String fullName;
 	private String firstName;
 	private String lastName;
+	private String description;//Code for Nexercise project
+	private String metaData;//Code for Nexercise project
 	
 	private Bitmap image;
 	
@@ -80,7 +82,22 @@ public class UserSettings implements Serializable {
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
 	}
+	/**Code for Nexercise project Starts*/
+	public String getDescription() {
+		return description;
+	}
 	
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	public String getMetaData() {
+		return metaData;
+	}
+	
+	public void setMetaData(String metaData) {
+		this.metaData = metaData;
+	}
+	/**Code for Nexercise project Ends*/
 	protected void splitName() {
 		if(fullName != null) {
 			String name = fullName;
@@ -165,6 +182,8 @@ public class UserSettings implements Serializable {
 	public void update(User user) {
 		setFirstName(user.getFirstName());
 		setLastName(user.getLastName());
+		setDescription(user.getDescription());//Code for Nexercise project
+		setMetaData(user.getMetaData());//Code for Nexercise project
 	}
 	
 	public void update(UserSettings other) {
@@ -172,6 +191,8 @@ public class UserSettings implements Serializable {
 		setAutoPostTwitter(other.isAutoPostTwitter());
 		setFirstName(other.getFirstName());
 		setLastName(other.getLastName());
+		setDescription(other.getDescription());//Code for Nexercise project
+		setMetaData(other.getMetaData());//Code for Nexercise project
 		setLocationEnabled(other.isLocationEnabled());
 		setNotificationsEnabled(other.isNotificationsEnabled());
 		setShowAuthDialog(other.isShowAuthDialog());

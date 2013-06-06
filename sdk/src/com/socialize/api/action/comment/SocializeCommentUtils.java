@@ -22,9 +22,11 @@
 package com.socialize.api.action.comment;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.util.Log;
 import com.socialize.ShareUtils;
@@ -135,80 +137,63 @@ public class SocializeCommentUtils extends SocializeActionUtilsBase implements C
 			final boolean doShare = isDisplayShareDialog(context, commentOptions);
 			final SocializeSession session = getSocialize().getSession();
 
-			if(isDisplayAuthDialog(context, session, commentOptions, networks)) {
+			/**Code added for Nexercise project Starts*/
+			if (isDisplayAuthDialog(context, session, commentOptions, networks)) {
 
-				authDialogFactory.show(context, new AuthDialogListener() {
+				String firstName = "";
+				try {
+					firstName = UserUtils.getCurrentUser(context).getFirstName();
+				} catch (SocializeException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
 
-					@Override
-					public void onShow(Dialog dialog, AuthPanelView dialogView) {}
-
-					@Override
-					public void onCancel(Dialog dialog) {
-						if(listener != null) {
-							listener.onCancel();
-						}
+				if (firstName != null && firstName.length() > 0) {
+					if (listener != null) {
+						listener.onCancel();
 					}
 
-					@Override
-					public void onSkipAuth(Activity context, Dialog dialog) {
-						dialog.dismiss();
-						try {
-							doCommentWithoutShareDialog(context, session, entity, text, commentOptions, listener);
-						}
-						catch (SocializeException e) {
-							if(listener != null) {
-								listener.onError(e);
-							}
-							if(logger != null) {
-								logger.error("Error adding comment", e);
-							}
-							else {
-								Log.e(SocializeLogger.LOG_TAG, "Error adding comment", e);
-							}
-						}
+					doCommentWithoutShareDialog(context, session, entity, text,
+							commentOptions, listener);
+				} else {
+
+					if (listener != null) {
+						listener.onCancel();
 					}
+					AlertDialog.Builder alertDialog = new AlertDialog.Builder(
+							context);
+					alertDialog.setTitle("Anonymous ");
+					alertDialog
+							.setMessage("You are anonymous.  To post you must change your settings.  Would you like to?");
 
-					@Override
-					public void onError(Activity context, Dialog dialog, Exception error) {
-						dialog.dismiss();
-						if(listener != null) {
-							listener.onError(SocializeException.wrap(error));
-						}
-					}
+					alertDialog.setPositiveButton("OK",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int which) {
 
-					@Override
-					public void onAuthenticate(Activity context, Dialog dialog, SocialNetwork network) {
-						dialog.dismiss();
-						try {
-							if(doShare) {
-								doCommentWithShareDialog(context, session, entity, text, commentOptions, listener);
-							}
-							else {
-								if(networks == null || networks.length == 0) {
-
-										doCommentWithoutShareDialog(context, session, entity, text, commentOptions, listener, UserUtils.getAutoPostSocialNetworks(context));
+									// here you can add functions
+									UserUtils.showUserSettingsForResult(context,
+											CommentActivity.PROFILE_UPDATE);
 
 								}
-								else {
-									doCommentWithoutShareDialog(context, session, entity, text, commentOptions, listener, networks);
+							});
+
+					alertDialog.setNegativeButton("Cancel",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int which) {
+
+									// here you can add functions
+
 								}
-							}
-						}
-						catch (SocializeException e) {
-							if(listener != null) {
-								listener.onError(e);
-							}
-							if(logger != null) {
-								logger.error("Error adding comment", e);
-							}
-							else {
-								Log.e(SocializeLogger.LOG_TAG, "Error adding comment", e);
-							}
-						}
-					}
-				}, !(config.isAllowSkipAuthOnComments() && config.isAllowSkipAuthOnAllActions()));
-			}
-			else {
+							});
+					alertDialog.show();
+
+				}
+
+			} else {
 				if(doShare) {
 					doCommentWithShareDialog(context, session, entity, text, commentOptions, listener);
 				}
@@ -218,9 +203,11 @@ public class SocializeCommentUtils extends SocializeActionUtilsBase implements C
 					}
 					else {
 						doCommentWithoutShareDialog(context, session, entity, text, commentOptions, listener, networks);
-					}
+					}					
 				}
+				
 			}
+			/**Code added for Nexercise project Ends*/		
 		}
 		catch (Throwable e) {
 			if(listener != null) {

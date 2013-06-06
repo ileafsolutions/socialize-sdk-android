@@ -6,6 +6,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+
+import com.nexercise.client.android.NexerciseApplication;
+import com.nexercise.client.android.constants.SocializeConstants;
+import com.nexercise.client.android.entities.UserInfo;
+import com.nexercise.client.android.model.DataLayer;
 import com.socialize.ConfigUtils;
 import com.socialize.android.ioc.IBeanFactory;
 import com.socialize.api.SocializeSession;
@@ -86,6 +91,12 @@ public class CommentListView extends BaseView {
 	private ViewGroup sliderAnchor;
 	private CustomCheckbox notifyBox;
 	private ImageLoader imageLoader;
+	
+	/**Code for Nexercise project Starts*/
+	UserInfo userInfo;
+	
+	boolean isDeveloper = false;
+	/**Code for Nexercise project Ends*/
 	
 	private CommentEntrySliderItem commentEntrySliderItem;
 	
@@ -688,7 +699,21 @@ public class CommentListView extends BaseView {
 		else if(commentEntryField != null) {
 			commentEntryField.setVisibility(GONE);
 		}
-		
+		/**Code for Nexercise project Starts*/
+		if(getEntity().getDisplayName().equals(SocializeConstants.TOPIC_OFFICIAL_ANNOUNCEMENTS)){
+			userInfo = getDataLayer().getUserInfo();
+			try{
+				isDeveloper = userInfo.isDeveloper();
+			}catch(Exception e){
+				
+			}
+			if(isDeveloper){
+				commentEntryField.setVisibility(View.VISIBLE);
+			}else{
+				commentEntryField.setVisibility(View.GONE);
+			}
+		}
+		/**Code for Nexercise project Ends*/
 		if(getSocialize().isAuthenticated()) {
 			doListComments(false);
 			doNotificationStatusLoad();
@@ -932,5 +957,9 @@ public class CommentListView extends BaseView {
 				header.setVisibility(View.GONE);
 			}
 		}
+	}
+	private DataLayer getDataLayer() {
+		return ((NexerciseApplication) getActivity().getApplication())
+				.getDataLayerInstance();
 	}
 }

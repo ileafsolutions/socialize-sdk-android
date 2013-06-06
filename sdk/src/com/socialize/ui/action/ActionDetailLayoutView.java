@@ -220,7 +220,8 @@ public class ActionDetailLayoutView extends BaseView {
 		
 		String profilePicData = user.getSmallImageUri();
 		final ImageView userIcon = content.getProfilePicture();
-		
+		content.setProfileClickable(getActivity(), user);//Code for Nexercise project
+
 		if(!StringUtils.isEmpty(profilePicData)) {
 			userIcon.getBackground().setAlpha(64);
 			
@@ -256,6 +257,14 @@ public class ActionDetailLayoutView extends BaseView {
 		
 		content.getDisplayName().setText(user.getDisplayName());
 		content.loadUserActivity(user, action);
+		
+		/**Code for Nexercise project Starts*/
+		if(StringUtils.isEmpty(actionId)){
+			if(user.getDescription() != null){
+				content.setUserBio(user.getDescription());
+			}
+		}
+		/**Code for Nexercise project Ends*/
 	}
 	
 	public void setDrawables(Drawables drawables) {

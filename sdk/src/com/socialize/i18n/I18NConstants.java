@@ -49,6 +49,8 @@ public class I18NConstants {
 	public static final String SETTINGS_HEADER = "socialize_settings_header";
 	public static final String SETTINGS_LABEL_FIRST_NAME = "socialize_settings_label_firstname";
 	public static final String SETTINGS_LABEL_LAST_NAME = "socialize_settings_label_lastname";
+	public static final String SETTINGS_LABEL_DESCRIPTION= "socialize_settings_label_description"; //Code for Nexercise project
+
 	public static final String ACTIONBAR_COMMENT = "socialize_actionbar_label_comment";
 	public static final String ACTIONBAR_SHARE = "socialize_actionbar_label_share";
 	public static final String ACTIONBAR_LIKE = "socialize_actionbar_label_like";

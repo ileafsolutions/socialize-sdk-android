@@ -67,7 +67,8 @@ public class ProfileSaveButtonListener implements OnClickListener {
 		UserSettings profile = new UserSettings();
 		profile.setFirstName(view.getFirstNameEdit().getText().toString().trim());
 		profile.setLastName(view.getLastNameEdit().getText().toString().trim());
-		
+		profile.setDescription(view.getDescriptionEdit().getText().toString().trim());//Code for Nexercise project 
+
 		
 		// Settings will only be changed if the image was altered
 		// See ProfileView#onImageChange

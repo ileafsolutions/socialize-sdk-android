@@ -68,6 +68,8 @@ public class ProfileContentView extends BaseView {
 	
 	private SocializeEditText firstNameEdit;
 	private SocializeEditText lastNameEdit;
+	private SocializeEditText descriptionEdit; // Code added for Nexercise
+
 	
 	private SocializeButton saveButton;
 	private SocializeButton cancelButton;
@@ -148,10 +150,12 @@ public class ProfileContentView extends BaseView {
 
 		firstNameEdit = socializeEditTextFactory.getBean();
 		lastNameEdit = socializeEditTextFactory.getBean();
-		
+		descriptionEdit = socializeEditTextFactory.getBean();// Code added for Nexercise
+
 		firstNameEdit.setLabel(localizationService.getString(I18NConstants.SETTINGS_LABEL_FIRST_NAME));
 		lastNameEdit.setLabel(localizationService.getString(I18NConstants.SETTINGS_LABEL_LAST_NAME));
-		
+		descriptionEdit.setLabel(localizationService.getString(I18NConstants.SETTINGS_LABEL_DESCRIPTION));//Code for Nexercise project
+
 		saveButton = profileSaveButtonFactory.getBean();
 		cancelButton = profileCancelButtonFactory.getBean();
 		
@@ -164,12 +168,14 @@ public class ProfileContentView extends BaseView {
 		profilePictureEditView.setLayoutParams(commonParams);
 		firstNameEdit.setLayoutParams(commonParams);
 		lastNameEdit.setLayoutParams(commonParams);
-		
+		descriptionEdit.setLayoutParams(commonParams);//Code for Nexercise project
+
 		master.addView(userId);
 		master.addView(profilePictureEditView);
 		master.addView(firstNameEdit);
 		master.addView(lastNameEdit);
-		
+		master.addView(descriptionEdit);//Code for Nexercise project
+
 		if(appUtils.isLocationAvailable(getContext())) {
 			locationEnabledCheckbox = locationEnabledCheckboxFactory.getBean();
 			locationEnabledCheckbox.setLayoutParams(commonParams);
@@ -356,7 +362,8 @@ public class ProfileContentView extends BaseView {
 		userId.setText("ID: "  + String.valueOf(user.getId()));
 		firstNameEdit.setText(settings.getFirstName());
 		lastNameEdit.setText(settings.getLastName());
-		
+		descriptionEdit.setText(settings.getDescription());//Code for Nexercise project
+
 		User currentUser = userService.getCurrentUser();
 		
 		setCurrentUser(currentUser);
@@ -496,7 +503,9 @@ public class ProfileContentView extends BaseView {
 	protected SocializeEditText getLastNameEdit() {
 		return lastNameEdit;
 	}
-
+	protected SocializeEditText getDescriptionEdit() {
+		return descriptionEdit; //Code for Nexercise project 
+	}
 	protected CheckBox getAutoPostFacebook() {
 		return autoPostFacebook;
 	}

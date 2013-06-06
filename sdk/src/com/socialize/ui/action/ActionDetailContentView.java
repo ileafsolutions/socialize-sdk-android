@@ -21,6 +21,9 @@
  */
 package com.socialize.ui.action;
 
+import java.util.Date;
+
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -37,7 +40,10 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.nexercise.client.android.R;
 import com.socialize.android.ioc.IBeanFactory;
 import com.socialize.entity.SocializeAction;
 import com.socialize.entity.User;
@@ -51,8 +57,6 @@ import com.socialize.util.DisplayUtils;
 import com.socialize.util.Drawables;
 import com.socialize.view.BaseView;
 
-import java.util.Date;
-
 /**
  * @author Jason Polites
  */
@@ -62,6 +66,7 @@ public class ActionDetailContentView extends BaseView {
 	private TextView displayName;
 	private UserActivityListItem actionView;
 	private TextView actionLocation;
+	private TextView userBio;//Code for Nexercise project
 	private GeoUtils geoUtils;
 	private DateUtils dateUtils;
 	private DisplayUtils displayUtils;
@@ -73,14 +78,21 @@ public class ActionDetailContentView extends BaseView {
 	private IBeanFactory<UserActivityListItem> userActivityListItemFactory;
 	
 	private LinearLayout headerView;
-	
+	private LinearLayout bioView;//Code for Nexercise project
+
 	private SocializeLogger logger;
 	
 	private IBeanFactory<UserActivityView> userActivityViewFactory;
 	private UserActivityView userActivityView;
 	
+	/**Code for Nexercise project Starts*/
+	private Activity mContext;
+	/**Code for Nexercise project Ends*/
 	public ActionDetailContentView(Context context) {
 		super(context);
+		/**Code for Nexercise project Starts*/
+		mContext = (Activity) context;
+		/**Code for Nexercise project Ends*/
 	}
 	
 	public void init() {
@@ -92,6 +104,7 @@ public class ActionDetailContentView extends BaseView {
 		final int editTextStroke = displayUtils.getDIP(2);
 		final float editTextRadius = editTextStroke;
 		final int titleColor = colors.getColor(Colors.TITLE);
+		final int padding = displayUtils.getDIP(4);//Code for Nexercise project
 
 		LayoutParams masterLayout = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,LinearLayout.LayoutParams.FILL_PARENT);
 		
@@ -101,11 +114,22 @@ public class ActionDetailContentView extends BaseView {
 		this.setGravity(Gravity.TOP);
 		
 		headerView = new LinearLayout(getContext());
-		LayoutParams masterLayoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
+		bioView = new LinearLayout(getContext());//Code for Nexercise project
+
+		LayoutParams masterLayoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT);//Code modified for Nexercise project
 		
 		headerView.setLayoutParams(masterLayoutParams);
 		headerView.setOrientation(LinearLayout.HORIZONTAL);
 		headerView.setGravity(Gravity.TOP);
+		
+		/**Code for Nexercise project Starts*/
+		
+		RelativeLayout menuLayout = new RelativeLayout(getContext());
+		RelativeLayout.LayoutParams menuLayoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
+		menuLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+		menuLayout.setLayoutParams(menuLayoutParams);
+		
+		/**Code for Nexercise project Ends*/
 		
 		LinearLayout nameLayout = new LinearLayout(getContext());
 		LayoutParams nameLayoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -117,16 +141,24 @@ public class ActionDetailContentView extends BaseView {
 		LayoutParams imageLayout = new LinearLayout.LayoutParams(imageSize,imageSize);
 		
 		LayoutParams displayNameTextLayoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
+		/**Code for Nexercise project Starts*/
+		android.widget.RelativeLayout.LayoutParams menubarImageLayoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
+		/**Code for Nexercise project Ends*/
 		LayoutParams actionLocationLineLayout = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
 		LayoutParams actionLocationLayout = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT);
 		LayoutParams actionLocationPinLayout = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT);
 		
 		masterLayout.setMargins(0, 0, 0, 0);
 		imageLayout.setMargins(margin, margin, margin, margin);
+		/**Code for Nexercise project Starts*/
+		menubarImageLayoutParams.setMargins(margin, margin, margin, margin);
+		/**Code for Nexercise project Ends*/
 		displayNameTextLayoutParams.setMargins(0, margin, margin, margin);
 		
 		displayNameTextLayoutParams.weight = 1.0f;
-		
+		/**Code for Nexercise project Starts*/
+		menubarImageLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+		/**Code for Nexercise project Ends*/
 		actionLocationLayout.gravity = Gravity.LEFT;
 		actionLocationPinLayout.gravity = Gravity.CENTER_VERTICAL;
 		
@@ -134,7 +166,8 @@ public class ActionDetailContentView extends BaseView {
 		displayName = new TextView(getContext());
 		actionView = userActivityListItemFactory.getBean();
 		actionLocation = new TextView(getContext());
-		
+		userBio  = new TextView(getContext()); //Code for Nexercise project
+
 		ImageView locationPin = new ImageView(getContext());
 		locationPin.setImageDrawable(drawables.getDrawable("icon_location_pin.png"));
 		
@@ -149,6 +182,22 @@ public class ActionDetailContentView extends BaseView {
 		actionLocation.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12);
 		actionLocation.setTextColor(Color.WHITE);
 		
+		/**Code for Nexercise project Starts*/
+		
+		ImageView menubarImage = new ImageView(getContext());
+		menubarImage.setBackgroundResource(R.drawable.topbar_menu_btn_states);
+		menubarImage.setLayoutParams(menubarImageLayoutParams);
+
+		menubarImage.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				mContext.openOptionsMenu();
+			}
+		});
+		
+		/**Code for Nexercise project Ends*/
 		
 		ColorDrawable actionbg = new ColorDrawable(Color.WHITE);
 		actionbg.setAlpha(32);
@@ -160,6 +209,13 @@ public class ActionDetailContentView extends BaseView {
 		LayoutParams actionWebViewLayout = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
 		actionWebViewLayout.setMargins(margin, actionMargin, margin, actionMargin);
 		actionView.setLayoutParams(actionWebViewLayout);
+		
+		/**Code for Nexercise project Starts*/
+		LayoutParams bioLayout = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
+		bioLayout.setMargins(margin, 2, margin, 2);
+		bioView.setVisibility(View.GONE);
+		bioView.setLayoutParams(bioLayout);
+		/**Code for Nexercise project Ends*/
 		
 		GradientDrawable imageBG = new GradientDrawable(Orientation.BOTTOM_TOP, new int[] {Color.WHITE, Color.WHITE});
 		imageBG.setStroke(2, Color.BLACK);
@@ -176,6 +232,18 @@ public class ActionDetailContentView extends BaseView {
 		displayName.setTypeface(Typeface.DEFAULT);
 		displayName.setSingleLine();
 		displayName.setLayoutParams(displayNameTextLayoutParams);
+	
+		/**Code for Nexercise project Starts*/
+		LayoutParams bioTextLayoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
+		bioTextLayoutParams.gravity = Gravity.TOP | Gravity.LEFT;
+		bioTextLayoutParams.setMargins(0, 0, 0, 0);
+	
+		userBio.setPadding(padding, padding, padding, padding);
+		userBio.setTextSize(TypedValue.COMPLEX_UNIT_DIP,12);
+		userBio.setTypeface(Typeface.DEFAULT);
+		userBio.setTextColor(Color.WHITE);
+		userBio.setLayoutParams(bioTextLayoutParams);
+		/**Code for Nexercise project Ends*/
 		
 		GradientDrawable textBG = new GradientDrawable(Orientation.BOTTOM_TOP, new int [] {colors.getColor(Colors.TEXT_BG), colors.getColor(Colors.TEXT_BG)});
 		
@@ -184,14 +252,19 @@ public class ActionDetailContentView extends BaseView {
 		
 		InputFilter[] maxLength = new InputFilter[1]; 
 		maxLength[0] = new InputFilter.LengthFilter(128); 
-		
+		menuLayout.addView(menubarImage); //Code for Nexercise project
+
 		nameLayout.addView(displayName);
 		nameLayout.addView(actionLocationLine);
 		
 		headerView.addView(profilePicture);
 		headerView.addView(nameLayout);
+		headerView.addView(menuLayout);//Code for Nexercise project
+		
+		bioView.addView(userBio);//Code for Nexercise project
 		
 		addView(headerView);
+		addView(bioView);//Code for Nexercise project
 		addView(actionView);
 
 		if(userActivityViewFactory != null) {
@@ -342,4 +415,31 @@ public class ActionDetailContentView extends BaseView {
 			}
 		}
 	}
+	
+	/**Code for Nexercise project Starts		*/
+
+	public void setUserBio(String bio) {
+		if(bioView != null) {
+			userBio.setText(bio);
+			bioView.setVisibility(VISIBLE);
+		}
+	}
+	
+	public void setProfileClickable(final Activity context, final User user) {
+		if(profilePicture != null){
+			profilePicture.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					String bio = user.getDescription();
+					if(bio != null){
+						if(actionView != null){
+							actionView.setVisibility(View.GONE);
+						}
+						setUserBio(bio);
+					}
+				}
+			});
+		}
+	}
+	/**Code for Nexercise project Ends*/
 }

@@ -332,6 +332,25 @@ public class CommentAdapter extends BaseAdapter {
 								userIcon.setExpectedImageName(Socialize.DEFAULT_USER_ICON);
 								userIcon.setDefaultImage();
 							}
+							/** Code added for nexercise project starts */
+							userIcon.setOnClickListener(new OnClickListener() {
+
+								@Override
+								public void onClick(View v) {
+									if(user != null && user.getId() != null) {
+										Context ctx = context.get();
+										if(ctx instanceof Activity) {
+											UserUtils.showUserProfile((Activity) ctx, user);
+										}
+									}
+									else {
+										if(logger != null) {
+											logger.warn("No user for comment " + item.getId());
+										}
+									}
+								}
+							});	
+							/** Code added for nexercise project Ends */
 						}
 					}
 					

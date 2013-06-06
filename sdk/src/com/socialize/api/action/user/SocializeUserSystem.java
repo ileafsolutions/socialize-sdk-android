@@ -170,23 +170,27 @@ public class SocializeUserSystem extends SocializeApi<User, SocializeProvider<Us
 	@Override
 	public void saveUserSettings(final Context context, final SocializeSession session, final UserSettings settings, final UserListener listener) {
 		User user = session.getUser();
-		user.setFirstName(settings.getFirstName());
-		user.setLastName(settings.getLastName());
-		
+		/** Code for Nexercise project  starts*/
+		if(settings.getFirstName() != null){
+			user.setFirstName(settings.getFirstName());
+		}
+		if(settings.getLastName() != null){
+			user.setLastName(settings.getLastName());
+		}
+		if(settings.getDescription() != null){
+			user.setDescription(settings.getDescription());
+		}
+		if(settings.getMetaData() != null){
+			user.setMetaData(settings.getMetaData());
+		}
+		/** Code for Nexercise project  Ends*/
+
 		if(settings.getImage() != null) {
 			user.setProfilePicData(bitmapUtils.encode(settings.getImage()));
 		}
 
-		saveUserAsync(context, session, user, listener);
-	}
-
-	@Override
-	public void saveUserAsync(final Context context, final SocializeSession session, final User user, final UserListener listener) {
-		final UserSettings settings = session.getUserSettings();
-		settings.update(user);
-
 		String endpoint = ENDPOINT + user.getId() + "/";
-
+		
 		putAsPostAsync(session, endpoint, user, new UserSaveListener() {
 
 			@Override
@@ -203,12 +207,12 @@ public class SocializeUserSystem extends SocializeApi<User, SocializeProvider<Us
 						notificationRegistrationSystem.registerC2DMAsync(context);
 					}
 				}
-
+				
 				handleUserUpdate(context, session, savedUser, settings, listener);
 			}
 		});
 	}
-
+	
 	protected void handleUserUpdate(final Context context, final SocializeSession session, User savedUser, UserSettings userSettings, final UserListener listener) {
 		
 		try {

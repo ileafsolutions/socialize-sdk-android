@@ -74,7 +74,8 @@ public class User extends SocializeObject {
 		setAuthData(user.getAuthData());
 		setProfilePicData(user.getProfilePicData());
 		setMetaData(user.getMetaData());
-		
+		setDescription(user.getDescription()); //Code for Nexercise project
+
 		// Set to null to re-create
 		displayName = null;
 	}

@@ -27,6 +27,10 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.view.Gravity;
 import android.widget.Toast;
+
+import com.nexercise.client.android.constants.DisplayConstants;
+import com.nexercise.client.android.helpers.PreferenceHelper;
+import com.nexercise.client.android.utils.NXRRewardsManager;
 import com.socialize.EntityUtils;
 import com.socialize.LikeUtils;
 import com.socialize.ShareUtils;
