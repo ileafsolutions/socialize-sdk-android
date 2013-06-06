@@ -24,10 +24,8 @@ package com.socialize.api.action.view;
 import android.app.Activity;
 import com.socialize.Socialize;
 import com.socialize.entity.Entity;
-import com.socialize.entity.User;
 import com.socialize.listener.view.ViewAddListener;
 import com.socialize.listener.view.ViewGetListener;
-import com.socialize.listener.view.ViewListListener;
 
 
 /**
@@ -45,24 +43,6 @@ public class SocializeViewUtils implements ViewUtilsProxy {
 	@Override
 	public void getView(Activity context, long id, ViewGetListener listener) {
 		viewSystem.getView(Socialize.getSocialize().getSession(), id, listener);
-	}
-
-	@Deprecated
-	@Override
-	public void getView(Activity context, Entity e, ViewGetListener listener) {
-		viewSystem.getView(Socialize.getSocialize().getSession(), e, listener);
-	}
-
-	@Deprecated
-	@Override
-	public void getViewsByUser(Activity context, User user, int start, int end, ViewListListener listener) {
-		viewSystem.getViewsByUser(Socialize.getSocialize().getSession(), user.getId(), start, end, listener);
-	}
-
-	@Deprecated
-	@Override
-	public void getViewsByEntity(Activity context, Entity entity, int start, int end, ViewListListener listener) {
-		viewSystem.getViewsByEntity(Socialize.getSocialize().getSession(), entity.getKey(), start, end, listener);
 	}
 
 	public void setViewSystem(ViewSystem viewSystem) {

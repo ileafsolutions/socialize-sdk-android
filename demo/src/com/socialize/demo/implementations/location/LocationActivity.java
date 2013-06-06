@@ -21,9 +21,6 @@
  */
 package com.socialize.demo.implementations.location;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -37,6 +34,10 @@ import com.socialize.LocationUtils;
 import com.socialize.demo.DemoActivity;
 import com.socialize.demo.R;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+
 
 /**
  * @author Jason Polites
@@ -45,8 +46,7 @@ import com.socialize.demo.R;
 public class LocationActivity extends DemoActivity {
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+	protected void onCreate() {
 
 		setContentView(R.layout.location);
 

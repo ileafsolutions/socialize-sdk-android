@@ -21,9 +21,8 @@
  */
 package com.socialize.demo.snippets;
 
-import java.util.List;
-import org.json.JSONObject;
 import android.app.Activity;
+import android.view.MenuItem;
 import com.socialize.CommentUtils;
 import com.socialize.UserUtils;
 import com.socialize.api.action.comment.CommentOptions;
@@ -41,6 +40,9 @@ import com.socialize.ui.comment.CommentListItem;
 import com.socialize.ui.comment.CommentListView;
 import com.socialize.ui.comment.LinkifyCommentViewActionListener;
 import com.socialize.ui.comment.OnCommentViewActionListener;
+import org.json.JSONObject;
+
+import java.util.List;
 
 
 /**
@@ -124,8 +126,20 @@ CommentUtils.showCommentView(this, entity, new OnCommentViewActionListener() {
 	public void onAfterSetComment(Comment comment, CommentListItem item) {
 		// Called after a single comment is set on the comment list item view
 	}
-	
-	
+
+	@Override
+	public boolean onRefreshMenuItemClick(MenuItem item) {
+		// Called when the user clicks the refresh option from the menu
+		// Return true to override default behavior
+		return false;
+	}
+
+	@Override
+	public boolean onSettingsMenuItemClick(MenuItem item) {
+		// Called when the user clicks the settings option from the menu
+		// Return true to override default behavior
+		return false;
+	}
 });
 //end-snippet-2
 }

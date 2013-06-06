@@ -21,9 +21,6 @@
  */
 package com.socialize.util;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -31,6 +28,10 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.provider.MediaStore;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 
 /**
@@ -107,10 +108,11 @@ public class ImageUtils {
 
 		String type = context.getContentResolver().getType(photoUri);
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		if (type.equals("image/png")) {
+		if (type != null && type.equals("image/png")) {
 			bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
 		}
-		else if (type.equals("image/jpg") || type.equals("image/jpeg")) {
+		else {
+            // (type.equals("image/jpg") || type.equals("image/jpeg"))
 			bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
 		}
 		byte[] bMapArray = baos.toByteArray();

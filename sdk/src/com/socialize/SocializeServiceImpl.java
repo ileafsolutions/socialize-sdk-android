@@ -21,16 +21,6 @@
  */
 package com.socialize;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -42,14 +32,7 @@ import com.socialize.api.SocializeSession;
 import com.socialize.api.action.ShareType;
 import com.socialize.api.action.share.ShareSystem;
 import com.socialize.api.action.user.UserSystem;
-import com.socialize.auth.AuthProvider;
-import com.socialize.auth.AuthProviderInfo;
-import com.socialize.auth.AuthProviderInfoBuilder;
-import com.socialize.auth.AuthProviderType;
-import com.socialize.auth.AuthProviders;
-import com.socialize.auth.SocializeAuthProviderInfo;
-import com.socialize.auth.UserProviderCredentials;
-import com.socialize.auth.UserProviderCredentialsMap;
+import com.socialize.auth.*;
 import com.socialize.concurrent.AsyncTaskManager;
 import com.socialize.concurrent.ManagedAsyncTask;
 import com.socialize.config.SocializeConfig;
@@ -71,11 +54,14 @@ import com.socialize.notifications.SocializeC2DMReceiver;
 import com.socialize.notifications.WakeLock;
 import com.socialize.ui.ActivityIOCProvider;
 import com.socialize.ui.SocializeEntityLoader;
-import com.socialize.util.AppUtils;
-import com.socialize.util.ClassLoaderProvider;
-import com.socialize.util.DisplayUtils;
-import com.socialize.util.EntityLoaderUtils;
-import com.socialize.util.ResourceLocator;
+import com.socialize.util.*;
+
+import java.lang.ref.WeakReference;
+import java.util.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * @author Jason Polites
@@ -102,6 +88,8 @@ public class SocializeServiceImpl implements SocializeService {
 	private SocializeConfig config = new SocializeConfig();
 	
 	private SocializeEntityLoader entityLoader;
+
+	private Class<?> userSettingsActivity;
 	
 	private String[] initPaths = null;
 	private int initCount = 0;
@@ -113,10 +101,16 @@ public class SocializeServiceImpl implements SocializeService {
 		this.logger = newLogger();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.socialize.SocializeService#handleBroadcastIntent(android.content.Context, android.content.Intent)
-	 */
+	@Override
+	public Class<?> getUserSettingsActivity() {
+		return userSettingsActivity;
+	}
+
+	@Override
+	public void setUserSettingsActivity(Class<?> userSettingsActivity) {
+		this.userSettingsActivity = userSettingsActivity;
+	}
+
 	@Override
 	public boolean handleBroadcastIntent(Context context, Intent intent) {
 		
@@ -182,7 +176,7 @@ public class SocializeServiceImpl implements SocializeService {
 	 */
 	@Override
 	public IOCContainer init(Context context) {
-		return init(context, getSystem().getBeanConfig());
+		return init(context, getSystem().getBeanConfig(context));
 	}
 	
 	/* (non-Javadoc)
@@ -211,7 +205,7 @@ public class SocializeServiceImpl implements SocializeService {
 	 */
 	@Override
 	public void initAsync(Context context, SocializeInitListener listener) {
-		initAsync(context, listener, getSystem().getBeanConfig());
+		initAsync(context, listener, getSystem().getBeanConfig(context));
 	}
 
 	/*
@@ -241,7 +235,7 @@ public class SocializeServiceImpl implements SocializeService {
 			
 			if(paths != null) {
 
-				if(isInitialized()) {
+				if(isInitialized(context)) {
 					
 					if(localPaths != null) {
 						for (String path : paths) {
@@ -285,20 +279,21 @@ public class SocializeServiceImpl implements SocializeService {
 				else {
 					init = true;
 				}
-				
+
 				if(init) {
 					try {
 						Logger.LOG_KEY = Socialize.LOG_KEY;
 						Logger.logLevel = Log.WARN;
 						
 						this.initPaths = paths;
-						
-						sort(this.initPaths);
+
+						// JP:  Not sure why this sort was here.. but it seems wrong
+//						sort(this.initPaths);
 						
 						if(container == null) {
 							container = newSocializeIOC();
 						}
-						
+
 						ResourceLocator locator = newResourceLocator();
 						
 						locator.setLogger(newLogger());
@@ -334,9 +329,9 @@ public class SocializeServiceImpl implements SocializeService {
 				else {
 					this.initCount++;
 				}
-				
-				// Always set the context on the container
-				setContext(context);
+
+                // Always set the context on the container
+                setContext(context);
 			}
 			else {
 				String msg = "Attempt to initialize Socialize with null bean config paths";
@@ -398,9 +393,9 @@ public class SocializeServiceImpl implements SocializeService {
 	}
 	
 	// So we can mock
-	protected void sort(Object[] array) {
-		Arrays.sort(array);
-	}
+//	protected void sort(Object[] array) {
+//		Arrays.sort(array);
+//	}
 	
 	/* (non-Javadoc)
 	 * @see com.socialize.SocializeService#init(android.content.Context, com.socialize.android.ioc.IOCContainer)
@@ -411,7 +406,7 @@ public class SocializeServiceImpl implements SocializeService {
 	}
 	
 	public synchronized void init(Context context, final IOCContainer container, SocializeInitListener listener) {
-		if(!isInitialized()) {
+		if(!isInitialized(context)) {
 			try {
 				this.container = container;
 				
@@ -420,7 +415,11 @@ public class SocializeServiceImpl implements SocializeService {
 				this.shareSystem = container.getBean("shareSystem");
 				this.userSystem = container.getBean("userSystem");
 				this.asserter = container.getBean("initializationAsserter");
-				this.authProviders = container.getBean("authProviders");
+
+				if(this.authProviders == null) {
+					this.authProviders = container.getBean("authProviders");
+				}
+
 				this.authProviderInfoBuilder = container.getBean("authProviderInfoBuilder");
 				this.notificationChecker = container.getBean("notificationChecker");
 				this.appUtils = container.getBean("appUtils");
@@ -580,6 +579,7 @@ public class SocializeServiceImpl implements SocializeService {
 			initPaths = null;
 			entityLoader = null;
 			session = null;
+			authProviders = null;
 		}
 		else {
 			destroy();
@@ -621,7 +621,7 @@ public class SocializeServiceImpl implements SocializeService {
 				public void run() {
 					try {
 						SocializeSession session = userSystem.authenticateSynchronous(context);
-						SocializeServiceImpl.this.session = session;
+						setSession(session);
 						latch.countDown();
 					}
 					catch (Exception e) {
@@ -730,6 +730,7 @@ public class SocializeServiceImpl implements SocializeService {
 		return new Comment();
 	}
 	
+	@Deprecated
 	public boolean isInitialized() {
 		return this.initCount > 0;
 	}
@@ -744,7 +745,7 @@ public class SocializeServiceImpl implements SocializeService {
 	 */
 	@Override
 	public boolean isAuthenticated() {
-		return isInitialized() && session != null;
+		return this.initCount > 0 && session != null;
 	}
 	
 	/*
@@ -839,7 +840,7 @@ public class SocializeServiceImpl implements SocializeService {
 			return asserter.assertInitialized(context, this, listener);
 		}
 		
-		if(!isInitialized()) {
+		if(!isInitialized(context)) {
 			if(listener != null) {
 				if(logger != null && logger.isInitialized()) {
 					listener.onError(new SocializeException(logger.getMessage(SocializeLogger.NOT_INITIALIZED)));
@@ -856,9 +857,10 @@ public class SocializeServiceImpl implements SocializeService {
 					logger.error("Socialize Not initialized!");
 				}
 			}
+			
+			return false;
 		}
-		
-		return isInitialized();		
+		return true;
 	}
 	
 	
@@ -889,7 +891,7 @@ public class SocializeServiceImpl implements SocializeService {
 	}
 	
 	public static class InitTask extends ManagedAsyncTask<Void, Void, IOCContainer> {
-		private Context context;
+		private WeakReference<Context> context;
 		private String[] paths;
 		private Exception error;
 		private SocializeInitListener listener;
@@ -903,7 +905,7 @@ public class SocializeServiceImpl implements SocializeService {
 				SocializeInitListener listener, 
 				SocializeLogger logger) {
 			super();
-			this.context = context;
+			this.context = new WeakReference<Context>(context);
 			this.paths = paths;
 			this.listener = listener;
 			this.service = service;
@@ -914,7 +916,7 @@ public class SocializeServiceImpl implements SocializeService {
 		public IOCContainer doInBackground(Void... params) {
 			try {
 				// Force null listener.  This will be called in postExecute
-				return service.initWithContainer(context, null, paths);
+				return service.initWithContainer(context.get(), null, paths);
 			}
 			catch (Exception e) {
 				error = e;
@@ -956,7 +958,7 @@ public class SocializeServiceImpl implements SocializeService {
 			}
 			else {
 				if(listener != null) {
-					listener.onInit(context, result);
+					listener.onInit(context.get(), result);
 				}
 			}
 		}

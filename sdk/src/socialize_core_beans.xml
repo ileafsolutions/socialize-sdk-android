@@ -22,14 +22,16 @@
 		</init-method>
 		<destroy-method name="destroy"/>
 	</bean>
-	
-	<bean id="deviceUtils" class="com.socialize.util.DeviceUtils">
-		<property name="logger" ref="logger"/>
-		<property name="appUtils" ref="appUtils"/>
-		<init-method name="init">
-			<arg type="context"/>
-		</init-method>
-	</bean>		
+
+<!-- Begin Doc Snippet -->
+<bean id="deviceUtils" class="com.socialize.util.DeviceUtils">
+    <property name="logger" ref="logger"/>
+    <property name="appUtils" ref="appUtils"/>
+    <init-method name="init">
+        <arg type="context"/>
+    </init-method>
+</bean>
+<!-- End Doc Snippet -->
 	
 	<bean id="appUtils" class="com.socialize.util.DefaultAppUtils" context-aware="false">
 		<property name="logger" ref="logger"/>
@@ -52,7 +54,7 @@
 	</bean>		
 	
 	<bean id="beanBuilder" class="com.socialize.android.ioc.BeanBuilder"/>
-	
+
 	<bean id="objectUtils" class="com.socialize.util.DefaultObjectUtils">
 		<property name="builder" ref="beanBuilder"/>
 	</bean>
@@ -560,6 +562,7 @@
 
 	<bean id="shareMessageBuilder" class="com.socialize.api.DefaultShareMessageBuilder">
 		<property name="appUtils" ref="appUtils"/>
+        <property name="localizationService" ref="localizationService"/>
 	</bean>	
 	
 	<bean id="facebookUrlBuilder" class="com.socialize.auth.facebook.FacebookUrlBuilder"/>
@@ -610,7 +613,7 @@
 		<property name="holder" ref="listenerHolder"/>
 		<property name="imageUtils" ref="imageUtils"/>		
 	</bean>
-	
+
 	<bean 
 		id="facebookV2Facade" 
 		extends="facebookFacadeBase"
@@ -619,7 +622,7 @@
 		<property name="facebookUtils" ref="facebookUtils"/>
 		<property name="facebookRunnerFactory" ref="facebookRunnerFactory"/>
 		<property name="facebookSessionStore" ref="facebookSessionStore"/>
-	</bean>					
+	</bean>
 	
 	<bean 
 		id="facebookV3Facade" 
@@ -643,8 +646,7 @@
 		id="twitterWebViewClient" 
 		class="com.socialize.auth.twitter.TwitterWebViewClient"
 		singleton="false">
-		<constructor-arg type="context"/>
-	</bean>		
+	</bean>
 	
 	<factory id="twitterWebViewClientFactory" makes="twitterWebViewClient"/>		
 	
@@ -688,6 +690,7 @@
 		<property name="httpRequestProvider" ref="httpRequestProvider"/>
 		<property name="requestSigner" ref="oauthSigner"/>
 		<property name="imageUtils" ref="imageUtils"/>
+        <property name="jsonParser" ref="jsonParser"/>
 		<property name="authProviderInfoBuilder" ref="authProviderInfoBuilder"/>
 	</bean>		
 

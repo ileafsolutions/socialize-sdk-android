@@ -21,9 +21,8 @@
  */
 package com.socialize.ui.comment;
 
-import java.util.Date;
-import java.util.List;
 import android.app.Activity;
+import android.content.Context;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -45,6 +44,10 @@ import com.socialize.util.DisplayUtils;
 import com.socialize.util.Drawables;
 import com.socialize.util.StringUtils;
 
+import java.lang.ref.WeakReference;
+import java.util.Date;
+import java.util.List;
+
 /**
  * Provides comments to the comment view.
  * @author Jason Polites
@@ -61,8 +64,8 @@ public class CommentAdapter extends BaseAdapter {
 	private DisplayUtils displayUtils;
 	private DateUtils dateUtils;
 	private ImageLoader imageLoader;
-	private Activity context;
-	
+	private WeakReference<Context> context;
+
 	private boolean last = false;
 	private Date now;
 	private int totalCount = 0;
@@ -75,8 +78,8 @@ public class CommentAdapter extends BaseAdapter {
 	
 	private final CommentListItem[] viewCache = new CommentListItem[viewCacheCount];
 
-	public void init(Activity context) {
-		this.context = context;
+	public void init(Context context) {
+		this.context = new WeakReference<Context>(context);
 		now = new Date();
 		if(displayUtils != null) {
 			densitySize = displayUtils.getDIP(iconSize);
@@ -100,6 +103,8 @@ public class CommentAdapter extends BaseAdapter {
 		viewCacheIndex = 0;
 		totalCount = 0;
 		count = 0;
+		notifyDataSetChanged();
+		notifyDataSetInvalidated();
 	}
 
 	@Override
@@ -162,7 +167,11 @@ public class CommentAdapter extends BaseAdapter {
 			tmpUser = item.getUser();
 		}
 
-		User currentUser = Socialize.getSocialize().getSession().getUser();
+		User currentUser = null;
+
+		if(Socialize.getSocialize().getSession() != null) {
+			currentUser = Socialize.getSocialize().getSession().getUser();
+		}
 
 		if(currentUser != null && tmpUser != null && currentUser.getId().equals(tmpUser.getId())) {
 			// Use this user as we may have been updated
@@ -202,7 +211,7 @@ public class CommentAdapter extends BaseAdapter {
 
 				if(item != null) {
 					
-					String displayName = "";
+					String displayName;
 					String imageUrl = null;
 					
 					if(user != null) {
@@ -217,14 +226,20 @@ public class CommentAdapter extends BaseAdapter {
 								displayName = "Anonymous";
 							}
 						}
-						
-						view.setDeleteOk(user.getId() == currentUser.getId());
+
+						if(currentUser != null) {
+							view.setDeleteOk(user.getId() == currentUser.getId());
+						}
+
 						view.setOnClickListener(new OnClickListener() {
 
 							@Override
 							public void onClick(View v) {
 								if(user != null && user.getId() != null) {
-									UserUtils.showUserProfileWithAction(context, user, item);
+									Context ctx = context.get();
+									if(ctx instanceof Activity) {
+										UserUtils.showUserProfileWithAction((Activity) ctx, user, item);
+									}
 								}
 								else {
 									if(logger != null) {
@@ -268,7 +283,7 @@ public class CommentAdapter extends BaseAdapter {
 					if (time != null) {
 						Long date = item.getDate();
 						if(date != null && date > 0) {
-							long diff = (now.getTime() - date.longValue());
+							long diff = (now.getTime() - date);
 							time.setText(dateUtils.getTimeString(diff) + " ");
 						}
 						else {
@@ -291,9 +306,9 @@ public class CommentAdapter extends BaseAdapter {
 										if(logger != null && logger.isDebugEnabled()) {
 											logger.debug("CommentAdpater setting image icon to cached image " + cached);
 										}
-										
+
 										userIcon.setExpectedImageName(imageUrl);
-										userIcon.setImageUrlImmediate(imageUrl);
+										userIcon.setImageUrlImmediate(imageUrl, false);
 									}
 									else {
 										userIcon.setExpectedImageName(imageUrl);

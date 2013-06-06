@@ -21,10 +21,10 @@
  */
 package com.socialize.demo.implementations.comment;
 
-import java.util.List;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.view.MenuItem;
 import com.socialize.CommentUtils;
 import com.socialize.demo.DemoActivity;
 import com.socialize.entity.Comment;
@@ -32,6 +32,8 @@ import com.socialize.error.SocializeException;
 import com.socialize.ui.comment.CommentListItem;
 import com.socialize.ui.comment.CommentListView;
 import com.socialize.ui.comment.OnCommentViewActionListener;
+
+import java.util.List;
 
 
 /**
@@ -41,8 +43,7 @@ import com.socialize.ui.comment.OnCommentViewActionListener;
 public class CommentViewCustomHeaderActivity extends DemoActivity {
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+	protected void onCreate() {
 		CommentUtils.showCommentView(this, entity, new OnCommentViewActionListener() {
 			
 			@Override
@@ -63,7 +64,7 @@ public class CommentViewCustomHeaderActivity extends DemoActivity {
 			public void onCreate(CommentListView view) {
 				view.setCustomHeaderText("Custom Header Text");
 				view.setShowCommentCountInHeader(false);
-				view.getHeader().setBackground(new ColorDrawable(Color.LTGRAY));
+				view.getHeader().setBackgroundDrawable(new ColorDrawable(Color.LTGRAY));
 				view.getHeader().getTitleText().setTextColor(Color.BLACK);
 			}
 			
@@ -75,6 +76,16 @@ public class CommentViewCustomHeaderActivity extends DemoActivity {
 			
 			@Override
 			public void onAfterSetComment(Comment comment, CommentListItem item) {}
+
+			@Override
+			public boolean onRefreshMenuItemClick(MenuItem item) {
+				return false;
+			}
+
+			@Override
+			public boolean onSettingsMenuItemClick(MenuItem item) {
+				return false;
+			}
 		});
 	}
 }

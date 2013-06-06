@@ -21,11 +21,6 @@
  */
 package com.socialize.demo;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -43,6 +38,12 @@ import com.socialize.entity.SocializeAction;
 import com.socialize.entity.SocializeObject;
 import com.socialize.ui.dialog.SafeProgressDialog;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 
 /**
  * @author Jason Polites
@@ -56,8 +57,7 @@ public abstract class SDKDemoActivity extends DemoActivity {
 
 	
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+	protected void onCreate() {
 		setContentView(R.layout.demo_activity);
 		
 		resultText = (TextView) findViewById(R.id.txtResult);

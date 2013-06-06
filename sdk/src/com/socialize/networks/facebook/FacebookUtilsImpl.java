@@ -21,8 +21,6 @@
  */
 package com.socialize.networks.facebook;
 
-import java.io.IOException;
-import java.util.Map;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -41,8 +39,12 @@ import com.socialize.facebook.Facebook;
 import com.socialize.listener.SocializeAuthListener;
 import com.socialize.networks.SocialNetworkPostListener;
 import com.socialize.networks.SocializeDeAuthListener;
+import com.socialize.networks.facebook.v2.FacebookPermissionCallback;
 import com.socialize.util.AppUtils;
 import com.socialize.util.ImageUtils;
+
+import java.io.IOException;
+import java.util.Map;
 
 
 /**

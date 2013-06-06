@@ -21,14 +21,13 @@
  */
 package com.socialize;
 
-import java.lang.reflect.Proxy;
 import android.app.Activity;
 import com.socialize.api.action.view.ViewUtilsProxy;
 import com.socialize.entity.Entity;
-import com.socialize.entity.User;
 import com.socialize.listener.view.ViewAddListener;
 import com.socialize.listener.view.ViewGetListener;
-import com.socialize.listener.view.ViewListListener;
+
+import java.lang.reflect.Proxy;
 
 
 /**
@@ -56,34 +55,7 @@ public class ViewUtils {
 		proxy.view(context, e, listener);
 	}
 	
-	/**
-	 * Retrieves a view for an entity and the current user.
-	 * @param context The current context.
-	 * @param e The entity that was viewed.
-	 * @param listener A listener to handle the result.
-	 * @deprecated No longer supported.
-	 */
-	@Deprecated
-	public static void getView (Activity context, Entity e, ViewGetListener listener) {
-		proxy.getView(context, e, listener);
-	}
-	
 	public static void getView (Activity context, long id, ViewGetListener listener) {
 		proxy.getView(context, id, listener);
-	}
-	
-	
-	/**
-	 * Lists all views for the given user.
-	 * @param context The current context.
-	 * @param user The user for whom views will be queried.
-	 * @param start The first index (for pagination), starting at 0
-	 * @param end The last index (for pagination)
-	 * @param listener A listener to handle the result.
-	 * @deprecated No longer supported.
-	 */
-	@Deprecated
-	public static void getViewsByUser (Activity context, User user, int start, int end, ViewListListener listener) {
-		proxy.getViewsByUser(context, user, start, end, listener);
 	}
 }

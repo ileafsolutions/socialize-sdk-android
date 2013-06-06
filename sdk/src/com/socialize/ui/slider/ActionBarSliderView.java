@@ -21,8 +21,6 @@
  */
 package com.socialize.ui.slider;
 
-import java.util.Map;
-import java.util.TreeMap;
 import android.content.Context;
 import android.view.View;
 import android.view.animation.Animation;
@@ -31,6 +29,9 @@ import com.socialize.log.SocializeLogger;
 import com.socialize.ui.actionbar.ActionBarView;
 import com.socialize.util.DisplayUtils;
 import com.socialize.view.BaseView;
+
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * @author Jason Polites
@@ -66,6 +67,8 @@ public class ActionBarSliderView extends BaseView {
 	private boolean moving = false;
 	
 	private ActionBarSliderItem currentItem;
+
+	public OnActionBarSliderMoveListener onActionBarSliderMoveListener;
 	
 	public ActionBarSliderView(Context context) {
 		super(context);
@@ -274,8 +277,6 @@ public class ActionBarSliderView extends BaseView {
 				break;
 		}			
 		
-
-		
 		displayState = DisplayState.CLOSE;
 	}
 	
@@ -283,11 +284,19 @@ public class ActionBarSliderView extends BaseView {
 		if(currentItem != null) {
 			currentItem.onClose(this);
 		}
+
+		if(onActionBarSliderMoveListener != null) {
+			onActionBarSliderMoveListener.onClose(this);
+		}
 	}
 	
 	public void onOpen() {
 		if(currentItem != null) {
 			currentItem.onOpen(this);
+		}
+
+		if(onActionBarSliderMoveListener != null) {
+			onActionBarSliderMoveListener.onOpen(this);
 		}
 	}
 	

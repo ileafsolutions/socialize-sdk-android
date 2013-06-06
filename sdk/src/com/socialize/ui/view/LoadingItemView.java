@@ -21,15 +21,18 @@
  */
 package com.socialize.ui.view;
 
-import java.util.List;
 import android.content.Context;
 import android.view.View;
 import android.widget.LinearLayout;
+
+import java.util.List;
 
 /**
  * @author Jason Polites
  */
 public class LoadingItemView<V extends View> extends BaseLoadingView<StaticItemList<V>> {
+
+	private List<V> items;
 
 	public LoadingItemView(Context context) {
 		super(context);
@@ -51,7 +54,12 @@ public class LoadingItemView<V extends View> extends BaseLoadingView<StaticItemL
 	}
 	
 	public void setItems(List<V> items) {
+		this.items = items;
 		getMainView().setItems(items);
 		getMainView().notifyDataSetChanged();
+	}
+
+	public List<V> getItems() {
+		return items;
 	}
 }

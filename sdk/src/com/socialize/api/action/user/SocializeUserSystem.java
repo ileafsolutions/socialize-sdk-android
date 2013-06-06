@@ -23,18 +23,8 @@ package com.socialize.api.action.user;
 
 import android.content.Context;
 import com.socialize.android.ioc.IBeanFactory;
-import com.socialize.api.SessionLock;
-import com.socialize.api.SocializeApi;
-import com.socialize.api.SocializeSession;
-import com.socialize.api.SocializeSessionConsumer;
-import com.socialize.api.SocializeSessionPersister;
-import com.socialize.auth.AuthProviderData;
-import com.socialize.auth.AuthProviderInfo;
-import com.socialize.auth.AuthProviderInfoBuilder;
-import com.socialize.auth.AuthProviderType;
-import com.socialize.auth.SocializeAuthProviderInfo;
-import com.socialize.auth.SocializeAuthProviderInfoFactory;
-import com.socialize.auth.UserProviderCredentials;
+import com.socialize.api.*;
+import com.socialize.auth.*;
 import com.socialize.config.SocializeConfig;
 import com.socialize.entity.User;
 import com.socialize.error.SocializeException;
@@ -186,9 +176,17 @@ public class SocializeUserSystem extends SocializeApi<User, SocializeProvider<Us
 		if(settings.getImage() != null) {
 			user.setProfilePicData(bitmapUtils.encode(settings.getImage()));
 		}
-		
+
+		saveUserAsync(context, session, user, listener);
+	}
+
+	@Override
+	public void saveUserAsync(final Context context, final SocializeSession session, final User user, final UserListener listener) {
+		final UserSettings settings = session.getUserSettings();
+		settings.update(user);
+
 		String endpoint = ENDPOINT + user.getId() + "/";
-		
+
 		putAsPostAsync(session, endpoint, user, new UserSaveListener() {
 
 			@Override
@@ -205,12 +203,12 @@ public class SocializeUserSystem extends SocializeApi<User, SocializeProvider<Us
 						notificationRegistrationSystem.registerC2DMAsync(context);
 					}
 				}
-				
+
 				handleUserUpdate(context, session, savedUser, settings, listener);
 			}
 		});
 	}
-	
+
 	protected void handleUserUpdate(final Context context, final SocializeSession session, User savedUser, UserSettings userSettings, final UserListener listener) {
 		
 		try {

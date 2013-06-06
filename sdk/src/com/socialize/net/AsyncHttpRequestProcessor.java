@@ -21,19 +21,21 @@
  */
 package com.socialize.net;
 
-import java.io.IOException;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
+import com.socialize.apache.http.entity.mime.MultipartEntity;
 import com.socialize.concurrent.ManagedAsyncTask;
 import com.socialize.error.SocializeApiError;
 import com.socialize.error.SocializeException;
 import com.socialize.log.SocializeLogger;
 import com.socialize.util.HttpUtils;
 import com.socialize.util.IOUtils;
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpUriRequest;
+
+import java.io.IOException;
 
 
 /**
@@ -79,10 +81,13 @@ public class AsyncHttpRequestProcessor extends ManagedAsyncTask<AsyncHttpRequest
 					if(httpRequest instanceof HttpPost) {
 						HttpPost post = (HttpPost) httpRequest;
 						HttpEntity entity = post.getEntity();
-						String requestData = ioUtils.readSafe(entity.getContent());
-						logger.debug("REQUEST \ndata:[" +
-								requestData +
-								"]");
+
+						if(!(entity instanceof MultipartEntity)) {
+							String requestData = ioUtils.readSafe(entity.getContent());
+							logger.debug("REQUEST \ndata:[" +
+									requestData +
+									"]");
+						}
 					}
 				}
 				
@@ -139,8 +144,13 @@ public class AsyncHttpRequestProcessor extends ManagedAsyncTask<AsyncHttpRequest
 		if(listener != null) {
 			HttpResponse response = result.getResponse();
 			String responseData = result.getResponseData();
+			int error = -1;
+			if(response != null) {
+				error = response.getStatusLine().getStatusCode();
+			}
+
 			if(result.getError() != null) {
-				listener.onError(result.getError(), response, response.getStatusLine().getStatusCode(), responseData);
+				listener.onError(result.getError(), response, error, responseData);
 			}
 			else {
 				listener.onSuccess(response, responseData);

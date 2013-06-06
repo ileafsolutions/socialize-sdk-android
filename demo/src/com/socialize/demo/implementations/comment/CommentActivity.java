@@ -21,10 +21,11 @@
  */
 package com.socialize.demo.implementations.comment;
 
-import java.util.List;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -37,6 +38,8 @@ import com.socialize.ui.comment.CommentListItem;
 import com.socialize.ui.comment.CommentListView;
 import com.socialize.ui.comment.OnCommentViewActionListener;
 
+import java.util.List;
+
 
 /**
  * @author Jason Polites
@@ -45,8 +48,8 @@ import com.socialize.ui.comment.OnCommentViewActionListener;
 public class CommentActivity extends ListActivity {
 	final String[] values = new String[] { 
 			"Show Comment List",
-			"Show Comment List (No Header)", 
-			"Show Comment List (Custom Header)", 
+			"Show Comment List (No Header)",
+			"Show Comment List (Custom Header)",
 			"Add Comment", 
 			"Add Comment Without Share", 
 			"Get Comments By Entity", 
@@ -68,11 +71,11 @@ public class CommentActivity extends ListActivity {
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, values);
 		setListAdapter(adapter);
 	}
-	
+
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		
-		if(position <= 1) {
+		if(position < 1) {
 			
 			String entity = null;
 			
@@ -81,7 +84,7 @@ public class CommentActivity extends ListActivity {
 				entity = "http://getsocialize.com";
 				break;
 			}
-			
+
 			CommentUtils.showCommentView(this, Entity.newInstance(entity, "Socialize"), new OnCommentViewActionListener() {
 				
 				@Override
@@ -115,6 +118,16 @@ public class CommentActivity extends ListActivity {
 
 				@Override
 				public void onAfterSetComment(Comment comment, CommentListItem item) {
+				}
+
+				@Override
+				public boolean onRefreshMenuItemClick(MenuItem item) {
+					return false;
+				}
+
+				@Override
+				public boolean onSettingsMenuItemClick(MenuItem item) {
+					return false;
 				}
 			});
 		}

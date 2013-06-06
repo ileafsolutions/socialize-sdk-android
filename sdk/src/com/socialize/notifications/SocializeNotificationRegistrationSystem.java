@@ -25,7 +25,9 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.util.Log;
 import com.socialize.android.ioc.IBeanFactory;
+import com.socialize.android.ioc.Logger;
 import com.socialize.api.DeviceRegistrationSystem;
 import com.socialize.api.SocializeSession;
 import com.socialize.api.action.user.UserSystem;
@@ -76,7 +78,6 @@ public class SocializeNotificationRegistrationSystem implements NotificationRegi
 	@Override
 	public void registerC2DMFailed(Context context, String cause) {
 		notificationRegistrationState.setC2dmPendingRequestTime(0);
-//		notificationRegistrationState.save(context);
 	}
 
 	@Override
@@ -84,7 +85,18 @@ public class SocializeNotificationRegistrationSystem implements NotificationRegi
 		new AsyncTask<Void, Void, Void>() {
 			@Override
 			protected Void doInBackground(Void... params) {
-				registerC2DM(context);
+				try {
+					registerC2DM(context);
+				}
+				catch (Exception e) {
+					if(logger != null) {
+						logger.error("Error during smart alert registration", e);
+					}
+					else {
+						Log.e(Logger.LOG_KEY, "Error during smart alert registration", e);
+					}
+				}
+
 				return null;
 			}
 		}.execute();

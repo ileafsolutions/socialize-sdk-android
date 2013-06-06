@@ -21,19 +21,6 @@
  */
 package com.socialize.test.integration.services.b;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.ProtocolVersion;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicHttpResponse;
-import org.apache.http.message.BasicStatusLine;
-import org.json.JSONObject;
 import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
@@ -67,14 +54,24 @@ import com.socialize.networks.PostData;
 import com.socialize.networks.SocialNetwork;
 import com.socialize.networks.SocialNetworkListener;
 import com.socialize.networks.SocialNetworkPostListener;
-import com.socialize.networks.twitter.PhotoTweet;
-import com.socialize.networks.twitter.Tweet;
-import com.socialize.networks.twitter.TwitterAccess;
-import com.socialize.networks.twitter.TwitterUtils;
-import com.socialize.networks.twitter.TwitterUtilsImpl;
+import com.socialize.networks.twitter.*;
 import com.socialize.test.SocializeActivityTest;
-import com.socialize.test.ui.util.TestUtils;
+import com.socialize.test.util.TestUtils;
 import com.socialize.util.StringUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.ProtocolVersion;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.message.BasicHttpResponse;
+import org.apache.http.message.BasicStatusLine;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -305,7 +302,11 @@ public class TwitterUtilsTest extends SocializeActivityTest {
 			@Override
 			public void onAfterPost(Activity parent, SocialNetwork socialNetwork, JSONObject responseObject) {}
 		};
-		
+
+		SocializeConfig config = new SocializeConfig();
+		config.setProperty("twitter.upload.endpoint", "foobar/");
+
+		utils.setConfig(config);
 		utils.tweetPhoto(TestUtils.getActivity(this), tweet, listener);
 		
 		String resource = getResult(0);
@@ -319,7 +320,7 @@ public class TwitterUtilsTest extends SocializeActivityTest {
 		assertSame(listener, listenerAfter);
 		assertSame(entity, entityAfter);
 		
-		assertEquals("https://upload.twitter.com/1/statuses/update_with_media.json", resource);
+		assertEquals("foobar/statuses/update_with_media.json", resource);
 		assertTrue(entityAfter instanceof CustomMultipartEntity);
 		
 		CustomMultipartEntity ce = (CustomMultipartEntity) entityAfter;
@@ -605,8 +606,10 @@ public class TwitterUtilsTest extends SocializeActivityTest {
 		Tweet tweet = new Tweet();
 		tweet.setShareLocation(false);
 		tweet.setText("foobar");
-		
-		twitterUtils.setApiEndpoint("mock");
+
+		SocializeConfig mockConfig = new SocializeConfig();
+		mockConfig.setProperty("twitter.api.endpoint", "mock");
+		twitterUtils.setConfig(mockConfig);
 		twitterUtils.tweet(TestUtils.getActivity(this), tweet, listener);
 		
 		String result = getResult(0);

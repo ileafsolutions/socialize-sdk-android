@@ -1,17 +1,8 @@
 package com.socialize.cache;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.TreeMap;
-
-import android.content.Context;
-
 import com.socialize.log.SocializeLogger;
+
+import java.util.*;
 
 /**
  * Simple cache object backed by a synchronized map which allows a TTL (Time To Live) for objects in cache.
@@ -55,9 +46,7 @@ public class TTLCache<K extends Comparable<K>, E extends ICacheable<K>> {
 			reap();
 		}
 	}
-	
-	protected Context context;
-	
+
 	public TTLCache() {
 		this(10, DEFAULT_CACHE_COUNT);
 	}
@@ -105,7 +94,7 @@ public class TTLCache<K extends Comparable<K>, E extends ICacheable<K>> {
 		Collection<TTLObject<K, E>> values = objects.values();
 
 		for (TTLObject<K, E> ttlObject : values) {
-			ttlObject.getObject().onRemove(context, destroy);
+			ttlObject.getObject().onRemove(destroy);
 		}
 		
 		objects.clear();
@@ -206,7 +195,7 @@ public class TTLCache<K extends Comparable<K>, E extends ICacheable<K>> {
 			
 			t.setEternal(eternal);
 			
-			long addedSize = object.getSizeInBytes(context);
+			long addedSize = object.getSizeInBytes();
 			long newSize = currentSizeInBytes + addedSize;
 			boolean oversize = false;
 			
@@ -217,7 +206,7 @@ public class TTLCache<K extends Comparable<K>, E extends ICacheable<K>> {
 				keys.put(k, key);	
 				objects.put(key, t);
 				
-				t.getObject().onPut(context, k);
+				t.getObject().onPut(k);
 				
 				// Increment size
 				currentSizeInBytes = newSize;
@@ -275,7 +264,7 @@ public class TTLCache<K extends Comparable<K>, E extends ICacheable<K>> {
 				eventListener.onGet(obj.getObject());
 			}			
 			
-			obj.getObject().onGet(context);
+			obj.getObject().onGet();
 			
 			return obj.getObject();
 	
@@ -364,8 +353,8 @@ public class TTLCache<K extends Comparable<K>, E extends ICacheable<K>> {
 			removed = objects.remove(key);
 			
 			if(removed != null) {
-				currentSizeInBytes -= removed.getObject().getSizeInBytes(context);
-				removed.getObject().onRemove(context, destroy);
+				currentSizeInBytes -= removed.getObject().getSizeInBytes();
+				removed.getObject().onRemove(destroy);
 			}
 			
 			keys.remove(strKey);
@@ -510,11 +499,11 @@ public class TTLCache<K extends Comparable<K>, E extends ICacheable<K>> {
 								
 								keys.remove(key.getKey());
 								
-								currentSizeInBytes -= object.getObject().getSizeInBytes(context);
+								currentSizeInBytes -= object.getObject().getSizeInBytes();
 								
 								reaped++;
 								
-								object.getObject().onRemove(context, true);
+								object.getObject().onRemove(true);
 							}
 						}
 						else {
@@ -568,9 +557,9 @@ public class TTLCache<K extends Comparable<K>, E extends ICacheable<K>> {
 							
 							size = newMap.size();
 							
-							currentSizeInBytes -= removed.getObject().getSizeInBytes(context);
+							currentSizeInBytes -= removed.getObject().getSizeInBytes();
 							
-							removed.getObject().onRemove(context, true);
+							removed.getObject().onRemove(true);
 							
 							reaped++;
 							
@@ -687,13 +676,5 @@ public class TTLCache<K extends Comparable<K>, E extends ICacheable<K>> {
 
 	public void setLogger(SocializeLogger logger) {
 		this.logger = logger;
-	}
-
-	/**
-	 * Sets the context
-	 * @param context
-	 */
-	public void init(Context context) {
-		this.context = context;
 	}
 }

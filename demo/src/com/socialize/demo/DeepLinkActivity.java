@@ -21,12 +21,12 @@
  */
 package com.socialize.demo;
 
+import android.net.Uri;
+import android.os.Bundle;
 import com.socialize.EntityUtils;
 import com.socialize.entity.Entity;
 import com.socialize.error.SocializeException;
 import com.socialize.listener.entity.EntityGetListener;
-import android.net.Uri;
-import android.os.Bundle;
 
 
 /**
@@ -36,8 +36,7 @@ import android.os.Bundle;
 public class DeepLinkActivity extends DemoActivity {
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+	protected void onCreate() {
 		Uri uri = getIntent().getData();
 		String key = uri.getQueryParameter("key");
 		if(key != null) {

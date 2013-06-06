@@ -22,7 +22,6 @@
 package com.socialize.auth.twitter;
 
 import android.app.Dialog;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.view.View;
@@ -41,15 +40,9 @@ public class TwitterWebViewClient extends WebViewClient {
 	private boolean called = false;
 	private boolean close = false;
 	private Dialog progress;
-	private Context context;
-	
+
 	public TwitterWebViewClient() {
 		super();
-	}
-	
-	public TwitterWebViewClient(Context context) {
-		super();
-		this.context = context;
 	}
 
 	public void setOauthRequestListener(OAuthRequestListener oAuthRequestListener) {
@@ -72,7 +65,7 @@ public class TwitterWebViewClient extends WebViewClient {
 		
 		if(url.trim().toLowerCase().startsWith(TwitterOAuthProvider.OAUTH_CALLBACK_URL.toLowerCase())) {
 		
-			progress = SafeProgressDialog.show(getContext(view));
+			progress = SafeProgressDialog.show(view.getContext());
 			
 			if(!called) {
 				called = true;
@@ -106,12 +99,5 @@ public class TwitterWebViewClient extends WebViewClient {
 		else {
 			super.onPageStarted(view, url, favicon);
 		}
-	}
-	
-	protected Context getContext(WebView view) {
-		if(context != null) {
-			return context;
-		}
-		return view.getContext();
 	}
 }

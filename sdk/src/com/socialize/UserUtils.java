@@ -21,7 +21,6 @@
  */
 package com.socialize;
 
-import java.lang.reflect.Proxy;
 import android.app.Activity;
 import android.content.Context;
 import com.socialize.api.action.user.UserUtilsProxy;
@@ -32,7 +31,10 @@ import com.socialize.listener.user.UserGetListener;
 import com.socialize.listener.user.UserSaveListener;
 import com.socialize.log.SocializeLogger;
 import com.socialize.networks.SocialNetwork;
+import com.socialize.ui.action.OnActionDetailViewListener;
 import com.socialize.ui.profile.UserSettings;
+
+import java.lang.reflect.Proxy;
 
 
 /**
@@ -55,7 +57,7 @@ public class UserUtils {
 	 * @param context The current context.
 	 * @return An array of SocialNetworks, or null if the user has not elected to auto post to any.
 	 */
-	public static SocialNetwork[] getAutoPostSocialNetworks(Context context) {
+	public static SocialNetwork[] getAutoPostSocialNetworks(Context context) throws SocializeException {
 		return proxy.getAutoPostSocialNetworks(context);
 	}
 
@@ -68,13 +70,32 @@ public class UserUtils {
 	public static User getCurrentUser(Context context) throws SocializeException  {
 		return proxy.getCurrentUser(context);
 	}
-	
+
+	/**
+	 * Returns the current logged in user.  If no user is currently authenticated this will authenticate asynchronously.
+	 * @param context The current context.
+	 * @param listener A listener to handle the result.
+	 */
+	public static void getCurrentUserAsync(Context context, UserGetListener listener)  {
+		proxy.getCurrentUserAsync(context, listener);
+	}
+
+	/**
+	 * Saves the given user.
+	 * @param context The current context.
+	 * @param user The user to be saved.
+	 * @param listener A listener to handle the result.
+	 */
+	public static void saveUserAsync(Context context, User user, UserSaveListener listener) {
+		proxy.saveUserAsync(context, user, listener);
+	}
+
 	/**
 	 * Returns the settings for the current user.
 	 * @param context The current context.
 	 * @return The settings for the current user.
 	 */
-	public static UserSettings getUserSettings(Context context) {
+	public static UserSettings getUserSettings(Context context) throws SocializeException {
 		return proxy.getUserSettings(context);
 	}
 	
@@ -94,7 +115,7 @@ public class UserUtils {
 	 * @param user The user for whom the profile will be shown.
 	 */
 	public static void showUserProfile (Activity context, User user) {
-		proxy.showUserProfileView(context, user, null);
+		proxy.showUserProfileView(context, user, null, null);
 	}
 	
 	/**
@@ -104,9 +125,32 @@ public class UserUtils {
 	 * @param action The action (comment/share/like) that was performed.
 	 */
 	public static void showUserProfileWithAction (Activity context, User user, SocializeAction action) {
-		proxy.showUserProfileView(context, user, action);
-	}	
-	
+		proxy.showUserProfileView(context, user, action, null);
+	}
+
+
+	/**
+	 * Shows the user profile UI for the given user.
+	 * @param context The current context.
+	 * @param user The user for whom the profile will be shown.
+	 * @param onActionDetailViewListener A listener to handle UI view events.
+	 */
+	public static void showUserProfile (Activity context, User user, OnActionDetailViewListener onActionDetailViewListener) {
+		proxy.showUserProfileView(context, user, null, onActionDetailViewListener);
+	}
+
+	/**
+	 * Shows the user profile UI for the given user.
+	 * @param context The current context.
+	 * @param user The user for whom the profile will be shown.
+	 * @param action The action (comment/share/like) that was performed.
+	 * @param onActionDetailViewListener A listener to handle UI view events.
+	 */
+	public static void showUserProfileWithAction (Activity context, User user, SocializeAction action, OnActionDetailViewListener onActionDetailViewListener) {
+		proxy.showUserProfileView(context, user, action, onActionDetailViewListener);
+	}
+
+
 	/**
 	 * Shows the settings UI for the current user.
 	 * @param context The current context.
@@ -137,7 +181,7 @@ public class UserUtils {
 	/**
 	 * Saves the profile for the given user.
 	 * @param context The current context.
-	 * @param user The user for whom the settings will be saved.
+	 * @param userSettings The user settings to be saved.
 	 * @param listener A listener to handle the save.
 	 */
 	public static void saveUserSettings (Context context, UserSettings userSettings, UserSaveListener listener) {

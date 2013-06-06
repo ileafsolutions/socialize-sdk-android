@@ -21,9 +21,6 @@
  */
 package com.socialize;
 
-import java.lang.reflect.Proxy;
-import java.util.ArrayList;
-import java.util.Set;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -35,6 +32,10 @@ import com.socialize.ui.util.KeyboardUtils;
 import com.socialize.util.AppUtils;
 import com.socialize.util.DisplayUtils;
 import com.socialize.util.IOUtils;
+
+import java.lang.reflect.Proxy;
+import java.util.ArrayList;
+import java.util.Set;
 
 /**
  * @author Jason Polites
@@ -72,7 +73,7 @@ public class SocializeTools {
 	public static AppUtils getAppUtils(Context context) {
 		return proxy.getAppUtils(context);
 	}		
-	
+
 	public static boolean sendExternalLogs(Activity context) {
 		Set<Uri> urls = proxy.getExternalLogFilePaths(context);
 		if(urls != null && urls.size() > 0) {
@@ -85,7 +86,7 @@ public class SocializeTools {
 		}
 		return false;
 	}
-	
+
 	public static void deleteExternalLogs(Context context) {
 		proxy.deleteExternalLogFiles(context);
 	}

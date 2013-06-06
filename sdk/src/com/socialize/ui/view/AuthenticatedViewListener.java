@@ -21,7 +21,6 @@
  */
 package com.socialize.ui.view;
 
-import android.content.Context;
 import android.view.View;
 import com.socialize.android.ioc.IOCContainer;
 import com.socialize.api.SocializeSession;
@@ -36,13 +35,11 @@ import com.socialize.log.SocializeLogger;
 public class AuthenticatedViewListener implements SocializeAuthListener {
 	
 	protected AuthenticatedView view;
-	protected Context context;
 	protected IOCContainer container;
 	
-	public AuthenticatedViewListener(Context context, AuthenticatedView view, IOCContainer container) {
+	public AuthenticatedViewListener(AuthenticatedView view, IOCContainer container) {
 		super();
 		this.view = view;
-		this.context = context;
 		this.container = container;
 	}
 	
@@ -64,7 +61,7 @@ public class AuthenticatedViewListener implements SocializeAuthListener {
 			SocializeLogger.e(view.getClass().getSimpleName() + " failed to produce a view");
 		}
 		
-		view.showError(context, error);
+		view.showError(view.getContext(), error);
 		SocializeLogger.e(error.getMessage(), error);
 		
 		if(view.getOnErrorListener() != null) {

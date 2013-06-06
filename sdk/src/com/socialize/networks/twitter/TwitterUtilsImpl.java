@@ -21,22 +21,6 @@
  */
 package com.socialize.networks.twitter;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONException;
-import org.json.JSONObject;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -70,8 +54,22 @@ import com.socialize.networks.SocialNetworkListener;
 import com.socialize.networks.SocialNetworkPostListener;
 import com.socialize.oauth.OAuthRequestSigner;
 import com.socialize.util.ImageUtils;
+import com.socialize.util.JSONParser;
 import com.socialize.util.StringUtils;
 import com.socialize.util.UrlBuilder;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.*;
+import java.util.Map.Entry;
 
 
 /**
@@ -83,11 +81,13 @@ public class TwitterUtilsImpl implements TwitterUtilsProxy {
 	private UserSystem userSystem;
 	private SocializeConfig config;
 	private OAuthRequestSigner requestSigner;
-	private String apiEndpoint = "https://api.twitter.com/1/";
-	private String photoEndpoint = "https://upload.twitter.com/1/";
+//	private String apiEndpoint = "https://api.twitter.com/1/";
+//	private String photoEndpoint = "https://upload.twitter.com/1/";
 	private HttpRequestProvider httpRequestProvider;
 	private ImageUtils imageUtils;
 	private AuthProviderInfoBuilder authProviderInfoBuilder;
+	private JSONParser jsonParser;
+	private SocializeConfig socializeConfig;
 	
 	/* (non-Javadoc)
 	 * @see com.socialize.networks.twitter.TwitterUtilsProxy#link(android.app.Activity, com.socialize.listener.SocializeAuthListener)
@@ -203,7 +203,8 @@ public class TwitterUtilsImpl implements TwitterUtilsProxy {
 			multipart.addPart("media", body);
 			multipart.addPart("status", status);
 			multipart.addPart("possibly_sensitive", possiblySensitive);
-			
+
+			String photoEndpoint = config.getProperty("twitter.upload.endpoint");
 			post(context, photoEndpoint + "statuses/update_with_media.json", multipart, listener);
 		}
 		catch (Exception e) {
@@ -274,9 +275,9 @@ public class TwitterUtilsImpl implements TwitterUtilsProxy {
 					data.add(new BasicNameValuePair(key, value.toString()));
 				}
 			}
-			
+
 			UrlEncodedFormEntity entity = new UrlEncodedFormEntity(data, "UTF-8");
-			
+			String apiEndpoint = config.getProperty("twitter.api.endpoint");
 			post(context, apiEndpoint + resource, entity, listener);
 		}
 		catch (Exception e) {
@@ -312,7 +313,7 @@ public class TwitterUtilsImpl implements TwitterUtilsProxy {
 				public void onSuccess(HttpResponse response, String responseData) {
 					
 					try {
-						JSONObject responseObject = new JSONObject(responseData);
+						JSONObject responseObject = jsonParser.parseObject(responseData);
 						if(listener != null) {
 							listener.onAfterPost(context, SocialNetwork.TWITTER, responseObject);
 						}
@@ -345,10 +346,19 @@ public class TwitterUtilsImpl implements TwitterUtilsProxy {
 		try {
 			resource = resource.trim();
 			
-			if(!resource.endsWith(".json")) {
-				resource += ".json";
+			if(!resource.contains(".json")) {
+				if(resource.contains("?")) {
+					String[] split = resource.split("\\?");
+					split[0] += ".json";
+					resource = split[0] + split[1];
+				}
+				else {
+					resource += ".json";
+				}
 			}
-			
+
+			String apiEndpoint = config.getProperty("twitter.api.endpoint");
+
 			UrlBuilder builder = new UrlBuilder();
 			builder.start(apiEndpoint + resource);
 			
@@ -382,7 +392,7 @@ public class TwitterUtilsImpl implements TwitterUtilsProxy {
 				public void onSuccess(HttpResponse response, String responseData) {
 					
 					try {
-						JSONObject responseObject = new JSONObject(responseData);
+						JSONObject responseObject = jsonParser.parseObject(responseData);
 						if(listener != null) {
 							listener.onAfterPost(context, SocialNetwork.TWITTER, responseObject);
 						}
@@ -435,11 +445,6 @@ public class TwitterUtilsImpl implements TwitterUtilsProxy {
 		this.requestSigner = requestSigner;
 	}
 
-	
-	public void setApiEndpoint(String apiEndpoint) {
-		this.apiEndpoint = apiEndpoint;
-	}
-
 	public void setHttpRequestProvider(HttpRequestProvider httpRequestProvider) {
 		this.httpRequestProvider = httpRequestProvider;
 	}
@@ -450,5 +455,9 @@ public class TwitterUtilsImpl implements TwitterUtilsProxy {
 
 	public void setAuthProviderInfoBuilder(AuthProviderInfoBuilder authProviderInfoBuilder) {
 		this.authProviderInfoBuilder = authProviderInfoBuilder;
+	}
+
+	public void setJsonParser(JSONParser jsonParser) {
+		this.jsonParser = jsonParser;
 	}
 }

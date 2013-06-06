@@ -26,6 +26,7 @@ import android.content.Context;
 import android.os.Bundle;
 import com.socialize.listener.SocializeInitListener;
 import com.socialize.log.SocializeLogger.LogLevel;
+import com.socialize.ui.SocializeActivityLifecycleListener;
 
 /**
  * Singleton helper class to make accessing the socialize service easier.
@@ -34,13 +35,11 @@ import com.socialize.log.SocializeLogger.LogLevel;
 public class Socialize {
 	
 	// This will be set during the build process
-	public static final String VERSION = "2.8.1";
+	public static final String VERSION = "2.9.2";
 	
 	public static final String ENTITY_OBJECT = "socialize.entity";
 	public static final String ENTITY_ID = "socialize.entity.id";
-	
-//	public static final Map<String, SocializeListener> STATIC_LISTENERS = new HashMap<String, SocializeListener>();
-	
+
 	public static final String ACTION_ID = "socialize.action.id";
 	public static final String ACTION_TYPE = "socialize.action.type";
 	public static final String DIRECT_URL = "socialize.direct.url";
@@ -54,6 +53,7 @@ public class Socialize {
 	static final SocializeServiceImpl instance = new SocializeServiceImpl();
 	
 	static SocializeLifecycleListener socializeLifecycleListener;
+	static SocializeActivityLifecycleListener socializeActivityLifecycleListener;
 
 	private Socialize() {
 		super();
@@ -63,7 +63,7 @@ public class Socialize {
 	 * Initialize Socialize synchronously.  Should not be called from the main UI thread.
 	 * @param context
 	 */
-	public static final void init(Context context) {
+	public static void init(Context context) {
 		instance.init(context);
 	}
 	
@@ -71,7 +71,7 @@ public class Socialize {
 	 * Initialize Socialize asynchronously.  Can be called from the main UI thread.
 	 * @param context
 	 */
-	public static final void initAsync(Context context) {
+	public static void initAsync(Context context) {
 		instance.initAsync(context, null);
 	}
 	
@@ -80,7 +80,7 @@ public class Socialize {
 	 * @param context
 	 * @param listener A listener which will be called after init.
 	 */
-	public static final void initAsync(Context context, SocializeInitListener listener) {
+	public static void initAsync(Context context, SocializeInitListener listener) {
 		instance.initAsync(context, listener);
 	}
 
@@ -88,7 +88,7 @@ public class Socialize {
 	 * Expert only.  Does not normally need to be called.
 	 * @param context
 	 */
-	public static final void destroy(Context context) {
+	public static void destroy(Context context) {
 		if(instance != null) {
 			instance.destroy();
 		}
@@ -98,7 +98,7 @@ public class Socialize {
 	 * Returns the Socialize singleton instance.
 	 * @return The Socialize singleton instance.
 	 */
-	public static final SocializeService getSocialize() {
+	public static SocializeService getSocialize() {
 		return instance;
 	}
 	
@@ -156,5 +156,13 @@ public class Socialize {
 	
 	public static void setSocializeLifecycleListener(SocializeLifecycleListener socializeLifecycleListener) {
 		Socialize.socializeLifecycleListener = socializeLifecycleListener;
+	}
+
+	public static SocializeActivityLifecycleListener getSocializeActivityLifecycleListener() {
+		return socializeActivityLifecycleListener;
+	}
+
+	public static void setSocializeActivityLifecycleListener(SocializeActivityLifecycleListener socializeActivityLifecycleListener) {
+		Socialize.socializeActivityLifecycleListener = socializeActivityLifecycleListener;
 	}
 }

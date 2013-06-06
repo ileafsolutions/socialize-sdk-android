@@ -29,11 +29,7 @@ import android.graphics.drawable.GradientDrawable.Orientation;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.ScrollView;
-import android.widget.TextView;
+import android.widget.*;
 import com.socialize.ShareUtils;
 import com.socialize.android.ioc.IBeanFactory;
 import com.socialize.api.SocializeSession;
@@ -251,7 +247,7 @@ public class SharePanelView extends DialogPanelView {
 		}
 		
 		otherOptions = new TextView(getContext());
-		otherOptions.setText(localizationService.getString(I18NConstants.SHARE_MORE_OPTIONS));
+		if(localizationService != null) otherOptions.setText(localizationService.getString(I18NConstants.SHARE_MORE_OPTIONS));
 		otherOptions.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12);
 		if(colors != null) otherOptions.setTextColor(colors.getColor(Colors.ANON_CELL_TITLE));
 		otherOptions.setGravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL);
@@ -611,16 +607,19 @@ public class SharePanelView extends DialogPanelView {
 					shareDialogListener.onContinue(dialog, remember, networks);
 				}
 			});
-			
-			cancelButton.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					dialog.dismiss();
-					shareDialogListener.onCancel(dialog);
-				}
-			});
-			
-			buttonLayout.addView(cancelButton);
+
+			if(cancelButton != null) {
+				cancelButton.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						dialog.dismiss();
+						shareDialogListener.onCancel(dialog);
+					}
+				});
+
+				buttonLayout.addView(cancelButton);
+			}
+
 			buttonLayout.addView(continueButton);
 		}
 		
@@ -662,7 +661,10 @@ public class SharePanelView extends DialogPanelView {
 			header.setBackgroundDrawable(headerBG);
 		}
 
-		header.setText(localizationService.getString(I18NConstants.SHARE_HEADER));
+		if(localizationService != null) {
+			header.setText(localizationService.getString(I18NConstants.SHARE_HEADER));
+		}
+
 		header.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
 		header.setTextColor(Color.WHITE);
 		header.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);

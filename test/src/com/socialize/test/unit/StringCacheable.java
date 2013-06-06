@@ -3,22 +3,21 @@
  */
 package com.socialize.test.unit;
 
-import android.content.Context;
 import com.socialize.cache.ISuicidal;
 
 /**
  * @author Jason
- * 
+ *
  */
 public class StringCacheable implements ISuicidal<String> {
-
+	
 	protected String value;
 	protected String key;
 	int onRemoveCount = 0;
-
+	
 	int onPutCount = 0;
 	int onGetCount = 0;
-
+	
 	public StringCacheable() {
 		super();
 	}
@@ -33,23 +32,16 @@ public class StringCacheable implements ISuicidal<String> {
 		return key;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.appmakr.android.cache.ICacheable#getSizeInBytes()
-	 */
 	@Override
-	public long getSizeInBytes(Context context) {
+	public long getSizeInBytes() {
 		return this.value.length();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see com.appmakr.android.cache.ICacheable#onRemove()
 	 */
 	@Override
-	public boolean onRemove(Context context, boolean expired) {
+	public boolean onRemove(boolean expired) {
 		onRemoveCount++;
 		return true;
 	}
@@ -61,16 +53,16 @@ public class StringCacheable implements ISuicidal<String> {
 	public final String getValue() {
 		return value;
 	}
-
+	
 	@Override
-	public boolean onPut(Context context, String key) {
+	public boolean onPut(String key) {
 		this.key = key;
 		onPutCount++;
 		return true;
 	}
 
 	@Override
-	public boolean onGet(Context context) {
+	public  boolean onGet() {
 		onGetCount++;
 		return true;
 	}

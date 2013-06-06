@@ -1,6 +1,5 @@
 package com.socialize.ui.comment;
 
-import java.util.List;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.view.View;
@@ -15,11 +14,7 @@ import com.socialize.api.action.comment.CommentUtilsProxy;
 import com.socialize.api.action.comment.SubscriptionUtilsProxy;
 import com.socialize.api.action.user.UserUtilsProxy;
 import com.socialize.config.SocializeConfig;
-import com.socialize.entity.Comment;
-import com.socialize.entity.Entity;
-import com.socialize.entity.ListResult;
-import com.socialize.entity.Subscription;
-import com.socialize.entity.User;
+import com.socialize.entity.*;
 import com.socialize.error.SocializeException;
 import com.socialize.i18n.I18NConstants;
 import com.socialize.listener.comment.CommentAddListener;
@@ -37,17 +32,17 @@ import com.socialize.ui.slider.ActionBarSliderFactory.ZOrder;
 import com.socialize.ui.slider.ActionBarSliderView;
 import com.socialize.ui.view.CustomCheckbox;
 import com.socialize.ui.view.LoadingListView;
-import com.socialize.util.AppUtils;
-import com.socialize.util.CacheableDrawable;
-import com.socialize.util.DisplayUtils;
-import com.socialize.util.Drawables;
-import com.socialize.util.StringUtils;
+import com.socialize.util.*;
 import com.socialize.view.BaseView;
+
+import java.util.List;
 
 public class CommentListView extends BaseView {
 
 	private int defaultGrabLength = 30;
 	private int iconSize = 100;
+	
+	private IBeanFactory<CommentAdapter> commentAdapterFactory;
 	private CommentAdapter commentAdapter;
 	private boolean loading = true; // Default to true
 	
@@ -101,6 +96,8 @@ public class CommentListView extends BaseView {
 	}
 	
 	public void init() {
+		
+		commentAdapter = commentAdapterFactory.getBean();
 
 		LayoutParams fill = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,LinearLayout.LayoutParams.FILL_PARENT);
 
@@ -175,16 +172,24 @@ public class CommentListView extends BaseView {
 					doNotificationStatusSave();
 				}
 			});
-			
-			UserSettings user = userUtils.getUserSettings(getContext());
-			
-			if(user.isNotificationsEnabled()) {
-				notifyBox.setVisibility(View.VISIBLE);
+
+			notifyBox.setVisibility(View.GONE);
+
+			try {
+				UserSettings user = userUtils.getUserSettings(getContext());
+				if(user.isNotificationsEnabled()) {
+					notifyBox.setVisibility(View.VISIBLE);
+				}
 			}
-			else {
-				notifyBox.setVisibility(View.GONE);
+			catch (SocializeException e) {
+				if(logger != null) {
+					logger.error("Error getting user settings", e);
+				}
+				else {
+					e.printStackTrace();
+				}
 			}
-			
+
 			sliderAnchor.addView(notifyBox);
 		}		
 		
@@ -348,9 +353,13 @@ public class CommentListView extends BaseView {
 		content.showLoading();
 		commentAdapter.reset();
 		
+		// We have to re-set the adapter.. otherwise we get crazy scrolling behavior
+		// http://support.getsocialize.com/socialize/topics/problems_rendering_of_chat_room_using_android_2_8_2?utm_content=topic_link&utm_medium=email&utm_source=reply_notification
+		content.setListAdapter(commentAdapter);
+		
 		if(onCommentViewActionListener != null) {
 			onCommentViewActionListener.onReload(this);
-		}
+		}		
 		
 		doListComments(true);
 	}
@@ -406,10 +415,11 @@ public class CommentListView extends BaseView {
 							commentAdapter.setLast(true);
 						}
 
-						if(update || comments == null) {
-							commentAdapter.notifyDataSetChanged();
+						if(update || comments == null || comments.size() == 0) {
 							content.scrollToTop();
 						}
+						
+						commentAdapter.notifyDataSetChanged();
 					}
 					
 					content.showList();
@@ -558,7 +568,7 @@ public class CommentListView extends BaseView {
 		}		
 	}
 	
-	protected void getNextSet() {
+	public void getNextSet() {
 		
 		if(logger != null && logger.isDebugEnabled()) {
 			logger.debug("getNextSet called on CommentListView");
@@ -566,11 +576,13 @@ public class CommentListView extends BaseView {
 		
 		loading = true; // Prevent continuous load
 
-		startIndex+=defaultGrabLength;
+		startIndex = endIndex;
 		endIndex+=defaultGrabLength;
 
-		if(endIndex > commentAdapter.getTotalCount()) {
-			endIndex = commentAdapter.getTotalCount();
+		int totalCount = commentAdapter.getTotalCount();
+
+		if(endIndex > totalCount) {
+			endIndex = totalCount;
 
 			if(startIndex >= endIndex) {
 				commentAdapter.setLast(true);
@@ -606,11 +618,19 @@ public class CommentListView extends BaseView {
 			@Override
 			public void onList(ListResult<Comment> entities) {
 				List<Comment> comments = commentAdapter.getComments();
-				comments.addAll(entities.getItems());
-				preLoadImages(comments);
+
+				if(entities != null) {
+					comments.addAll(entities.getItems());
+					preLoadImages(comments);
+				}
+
 				commentAdapter.setComments(comments);
 				commentAdapter.notifyDataSetChanged();
 				loading = false;
+
+				if(onCommentViewActionListener != null && entities != null) {
+					onCommentViewActionListener.onCommentList(CommentListView.this, comments, startIndex, endIndex);
+				}
 			}
 		});
 	}
@@ -793,14 +813,25 @@ public class CommentListView extends BaseView {
 		if(commentEntrySlider != null) {
 			commentEntrySlider.updateContent();
 		}
-		
-		UserSettings user = userUtils.getUserSettings(getContext());
-		
-		if(notifyBox != null && user != null) {
-			if(user.isNotificationsEnabled()) {
-				notifyBox.setVisibility(View.VISIBLE);
+
+		if(notifyBox != null) {
+			try {
+				UserSettings user = userUtils.getUserSettings(getContext());
+				if(user.isNotificationsEnabled()) {
+					notifyBox.setVisibility(View.VISIBLE);
+				}
+				else {
+					notifyBox.setVisibility(View.GONE);
+				}
 			}
-			else {
+			catch (SocializeException e) {
+				if(logger != null) {
+					logger.error("Error getting user settings", e);
+				}
+				else {
+					e.printStackTrace();
+				}
+
 				notifyBox.setVisibility(View.GONE);
 			}
 		}
@@ -879,6 +910,10 @@ public class CommentListView extends BaseView {
 		this.showCommentCountInHeader = showCommentCountInHeader;
 	}
 	
+	public void setCommentAdapterFactory(IBeanFactory<CommentAdapter> commentAdapterFactory) {
+		this.commentAdapterFactory = commentAdapterFactory;
+	}
+
 	public SocializeHeader getHeader() {
 		return header;
 	}

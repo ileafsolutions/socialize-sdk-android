@@ -21,16 +21,20 @@
  */
 package com.socialize.test;
 
-import java.util.List;
 import android.app.Activity;
-import com.socialize.sample.EmptyActivity;
-import com.socialize.test.ui.util.TestUtils;
+import com.socialize.entity.Entity;
+import com.socialize.test.util.TestUtils;
+import com.socialize.testapp.EmptyActivity;
+
+import java.util.List;
 
 public abstract class SocializeActivityTest extends SocializeManagedActivityTest<EmptyActivity> {
-	
-	
+
+	// Sample entity defined in comments.json
+	protected final Entity entity = Entity.newInstance("http://entity1.com", "http://entity1.com");
+
 	public SocializeActivityTest() {
-		super("com.socialize.sample", EmptyActivity.class);
+		super("com.socialize.testapp", EmptyActivity.class);
 	}
 
 	@Override

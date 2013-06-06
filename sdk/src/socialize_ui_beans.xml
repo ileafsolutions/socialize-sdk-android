@@ -6,9 +6,6 @@
 	<bean id="cache" class="com.socialize.util.DrawableCache">
 		<constructor-arg type="integer" value="10"/> <!-- Min size -->
 		<constructor-arg type="integer" value="100"/> <!-- Max size -->
-		<init-method name="init">
-			<arg type="context"/>
-		</init-method>		
 		<destroy-method name="destroy"/>
 	</bean>
 	
@@ -777,6 +774,8 @@
 		</init-method>			
 	</bean>
 	
+	<factory id="commentAdapterFactory" makes="commentAdapter"/>	
+	
 	<bean 
 		id="commentListItemBackgroundFactory" 
 		class="com.socialize.ui.comment.CommentListItemBackgroundFactory">
@@ -841,7 +840,7 @@
 
 		<init-method name="init"/>
 		
-		<property name="commentAdapter" ref="commentAdapter"/>
+		<property name="commentAdapterFactory" ref="commentAdapterFactory"/>
 		<property name="drawables" ref="drawables"/>
 		<property name="appUtils" ref="appUtils"/>
 		<property name="config" ref="config"/>
@@ -993,6 +992,7 @@
 		<property name="progressDialogFactory" ref="progressDialogFactory"/>
 		<property name="actionDetailContentViewFactory" ref="actionDetailContentViewFactory"/>
 		<property name="imageLoader" ref="imageLoader"/>
+        <property name="listenerHolder" ref="listenerHolder"/>
 	</bean> 	
 	
 	<bean 
@@ -1576,6 +1576,7 @@
 	<bean id="userUtils" class="com.socialize.api.action.user.SocializeUserUtils" extends="utilsBase">
 		<property name="userSystem" ref="userSystem"/>
 		<property name="logger" ref="logger"/>
+        <property name="listenerHolder" ref="listenerHolder"/>
 	</bean>
 	
 	<bean id="actionUtils" class="com.socialize.api.action.activity.SocializeActionUtils">

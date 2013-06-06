@@ -30,27 +30,31 @@ import com.socialize.error.SocializeException;
 import com.socialize.listener.user.UserGetListener;
 import com.socialize.listener.user.UserSaveListener;
 import com.socialize.networks.SocialNetwork;
+import com.socialize.ui.action.OnActionDetailViewListener;
 import com.socialize.ui.profile.UserSettings;
 
 
 /**
  * @author Jason Polites
- *
  */
 public interface UserUtilsProxy {
 
 	@Synchronous
 	public User getCurrentUser(Context context) throws SocializeException;
+
+	public void getCurrentUserAsync(Context context, UserGetListener listener);
 	
 	@Synchronous
-	public UserSettings getUserSettings(Context context);
+	public UserSettings getUserSettings(Context context) throws SocializeException;
 	
 	@Synchronous
-	public SocialNetwork[] getAutoPostSocialNetworks(Context context);
+	public SocialNetwork[] getAutoPostSocialNetworks(Context context) throws SocializeException;
 	
 	public void getUser(Context context, long id, UserGetListener listener);
 	
 	public void saveUserSettings (Context context, UserSettings settings, UserSaveListener listener);
+
+	public void saveUserAsync (Context context, User user, UserSaveListener listener);
 	
 	@Synchronous
 	public void showUserSettingsView(Activity context, Long userId);
@@ -59,7 +63,7 @@ public interface UserUtilsProxy {
 	public void showUserSettingsViewForResult(Activity context, Long userId, int requestCode);
 	
 	@Synchronous
-	public void showUserProfileView(Activity context, User user, SocializeAction action);
+	public void showUserProfileView(Activity context, User user, SocializeAction action, OnActionDetailViewListener onActionDetailViewListener);
 	
 	@Synchronous
 	public void clearSession(Context context);

@@ -21,10 +21,12 @@
  */
 package com.socialize.ui.comment;
 
-import java.util.List;
 import android.text.util.Linkify;
+import android.view.MenuItem;
 import com.socialize.entity.Comment;
 import com.socialize.error.SocializeException;
+
+import java.util.List;
 
 
 /**
@@ -98,4 +100,13 @@ public class LinkifyCommentViewActionListener implements OnCommentViewActionList
 	@Override
 	public void onPostComment(Comment comment) {}
 
+	@Override
+	public boolean onRefreshMenuItemClick(MenuItem item) {
+		return false;
+	}
+
+	@Override
+	public boolean onSettingsMenuItemClick(MenuItem item) {
+		return false;
+	}
 }

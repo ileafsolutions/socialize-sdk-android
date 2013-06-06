@@ -3,9 +3,11 @@
  */
 package com.socialize.ui.comment;
 
-import java.util.List;
+import android.view.MenuItem;
 import com.socialize.entity.Comment;
 import com.socialize.listener.SocializeListener;
+
+import java.util.List;
 
 /**
  * Provides a callback for comment view events.
@@ -26,4 +28,8 @@ public interface OnCommentViewActionListener extends SocializeListener {
 	public void onReload(CommentListView view);
 	
 	public void onPostComment(Comment comment);
+
+	public boolean onSettingsMenuItemClick(MenuItem item);
+
+	public boolean onRefreshMenuItemClick(MenuItem item);
 }

@@ -21,14 +21,21 @@
  */
 package com.socialize.provider;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
+import android.content.Context;
+import com.socialize.android.ioc.IBeanFactory;
+import com.socialize.api.*;
+import com.socialize.api.action.ActionType;
+import com.socialize.auth.*;
+import com.socialize.config.SocializeConfig;
+import com.socialize.entity.*;
+import com.socialize.error.SocializeApiError;
+import com.socialize.error.SocializeException;
+import com.socialize.log.SocializeLogger;
+import com.socialize.net.HttpClientFactory;
+import com.socialize.util.HttpUtils;
+import com.socialize.util.IOUtils;
+import com.socialize.util.JSONParser;
+import com.socialize.util.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -39,38 +46,11 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import android.content.Context;
-import com.socialize.android.ioc.IBeanFactory;
-import com.socialize.api.SessionLock;
-import com.socialize.api.SocializeRequestFactory;
-import com.socialize.api.SocializeSession;
-import com.socialize.api.SocializeSessionFactory;
-import com.socialize.api.SocializeSessionPersister;
-import com.socialize.api.WritableSession;
-import com.socialize.api.action.ActionType;
-import com.socialize.auth.AuthProviderData;
-import com.socialize.auth.AuthProviderInfo;
-import com.socialize.auth.AuthProviderInfoBuilder;
-import com.socialize.auth.AuthProviderType;
-import com.socialize.auth.DefaultUserProviderCredentials;
-import com.socialize.auth.UserProviderCredentials;
-import com.socialize.auth.UserProviderCredentialsMap;
-import com.socialize.config.SocializeConfig;
-import com.socialize.entity.ActionError;
-import com.socialize.entity.ErrorFactory;
-import com.socialize.entity.ListResult;
-import com.socialize.entity.SocializeObject;
-import com.socialize.entity.SocializeObjectFactory;
-import com.socialize.entity.User;
-import com.socialize.entity.UserAuthData;
-import com.socialize.error.SocializeApiError;
-import com.socialize.error.SocializeException;
-import com.socialize.log.SocializeLogger;
-import com.socialize.net.HttpClientFactory;
-import com.socialize.util.HttpUtils;
-import com.socialize.util.IOUtils;
-import com.socialize.util.JSONParser;
-import com.socialize.util.StringUtils;
+
+import java.io.IOException;
+import java.lang.ref.WeakReference;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * @author Jason Polites
@@ -96,15 +76,15 @@ public abstract class BaseSocializeProvider<T extends SocializeObject> implement
 	private IOUtils ioUtils;
 	private SocializeSessionPersister sessionPersister;
 	private SocializeConfig config;
-	private Context context;
-	
+	private WeakReference<Context> context;
+
 	public BaseSocializeProvider() {
 		super();
 	}
 	
 	@Override
 	public void init(Context context) {
-		this.context = context;
+		this.context = new WeakReference<Context>(context);
 	}
 
 	public void setUserFactory(SocializeObjectFactory<User> userFactory) {
@@ -164,7 +144,7 @@ public abstract class BaseSocializeProvider<T extends SocializeObject> implement
 	public WritableSession loadSession(String endpoint, String key, String secret) throws SocializeException {
 		
 		if(sessionPersister != null) {
-			WritableSession loaded = sessionPersister.load(context);
+			WritableSession loaded = sessionPersister.load(context.get());
 			
 			// Verify that the key/secret matches
 			if(loaded != null) {
@@ -236,20 +216,20 @@ public abstract class BaseSocializeProvider<T extends SocializeObject> implement
 	@Override
 	public void clearSession(AuthProviderType type) {
 		if(sessionPersister != null) {
-			sessionPersister.delete(context, type);
+			sessionPersister.delete(context.get(), type);
 		}
 	}
 
 	@Override
 	public void clearSession() {
 		if(sessionPersister != null) {
-			sessionPersister.delete(context);
+			sessionPersister.delete(context.get());
 		}
 	}
 
 	public void saveSession(SocializeSession session) {
 		if(sessionPersister != null) {
-			sessionPersister.save(context, session);
+			sessionPersister.save(context.get(), session);
 		}
 	}
 
@@ -302,7 +282,7 @@ public abstract class BaseSocializeProvider<T extends SocializeObject> implement
 					if(httpUtils.isHttpError(response)) {
 						
 						if(sessionPersister != null && httpUtils.isAuthError(response)) {
-							sessionPersister.delete(context);
+							sessionPersister.delete(context.get());
 						}
 						
 						String msg = ioUtils.readSafe(entity.getContent());
@@ -461,7 +441,7 @@ public abstract class BaseSocializeProvider<T extends SocializeObject> implement
 				if(httpUtils.isHttpError(response)) {
 					
 					if(sessionPersister != null && httpUtils.isAuthError(response)) {
-						sessionPersister.delete(context);
+						sessionPersister.delete(context.get());
 					}
 					
 					String msg = ioUtils.readSafe(entity.getContent());
@@ -559,7 +539,7 @@ public abstract class BaseSocializeProvider<T extends SocializeObject> implement
 				if(httpUtils.isHttpError(response)) {
 					
 					if(sessionPersister != null && httpUtils.isAuthError(response)) {
-						sessionPersister.delete(context);
+						sessionPersister.delete(context.get());
 					}
 					
 					String msg = ioUtils.readSafe(entity.getContent());
@@ -656,7 +636,7 @@ public abstract class BaseSocializeProvider<T extends SocializeObject> implement
 				if(httpUtils.isHttpError(response)) {
 					
 					if(sessionPersister != null && httpUtils.isAuthError(response)) {
-						sessionPersister.delete(context);
+						sessionPersister.delete(context.get());
 					}
 					
 					String msg = ioUtils.readSafe(entity.getContent());

@@ -21,7 +21,6 @@
  */
 package com.socialize.demo.implementations.share;
 
-import org.json.JSONObject;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -40,12 +39,14 @@ import com.socialize.demo.ConfigDialog;
 import com.socialize.demo.DemoActivity;
 import com.socialize.demo.DemoUtils;
 import com.socialize.demo.R;
+import com.socialize.error.SocializeException;
 import com.socialize.networks.PostData;
 import com.socialize.networks.SocialNetwork;
 import com.socialize.networks.facebook.FacebookUtils;
 import com.socialize.networks.twitter.TwitterUtils;
 import com.socialize.ui.dialog.SafeProgressDialog;
 import com.socialize.ui.share.DialogFlowController;
+import org.json.JSONObject;
 
 
 /**
@@ -55,8 +56,7 @@ import com.socialize.ui.share.DialogFlowController;
 public class ShareButtonsActivity extends DemoActivity {
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+	protected void onCreate() {
 		setContentView(R.layout.share_buttons_activity);
 		
 		Button btnShare = (Button) findViewById(R.id.btnShare);
@@ -96,9 +96,7 @@ public class ShareButtonsActivity extends DemoActivity {
 						progress.dismiss();
 						DemoUtils.showToast(parent, "Shared to " + socialNetwork.name());
 					}
-					
-					
-				});				
+				});
 			}
 		});
 		
@@ -143,6 +141,18 @@ public class ShareButtonsActivity extends DemoActivity {
 					@Override
 					public void onAfterPost(Activity parent, SocialNetwork socialNetwork, JSONObject response) {
 						DemoUtils.showToast(parent, "Shared to " + socialNetwork.name());
+					}
+
+					@Override
+					public void onError(SocializeException error) {
+						DemoUtils.showErrorDialog(ShareButtonsActivity.this, error);
+						error.printStackTrace();
+					}
+
+					@Override
+					public void onNetworkError(Activity context, SocialNetwork network, Exception error) {
+						DemoUtils.showErrorDialog(context, error);
+						error.printStackTrace();
 					}
 				});
 			}

@@ -20,9 +20,10 @@
  * THE SOFTWARE.
  */
 package com.socialize.demo.snippets;
-import java.util.List;
+
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import com.socialize.ActionBarUtils;
 import com.socialize.demo.R;
@@ -35,6 +36,8 @@ import com.socialize.ui.actionbar.ActionBarView;
 import com.socialize.ui.comment.CommentListItem;
 import com.socialize.ui.comment.CommentListView;
 import com.socialize.ui.comment.OnCommentViewActionListener;
+
+import java.util.List;
 
 //begin-snippet-0
 public class ActionBarCommentListener extends Activity {
@@ -101,6 +104,20 @@ public class ActionBarCommentListener extends Activity {
 					@Override
 					public void onAfterSetComment(Comment comment, CommentListItem item) {
 						// Called after a single comment is set on the comment list item view
+					}
+
+					@Override
+					public boolean onRefreshMenuItemClick(MenuItem item) {
+						// Called when the user clicks the refresh option from the menu
+						// Return true to override default behavior
+						return false;
+					}
+
+					@Override
+					public boolean onSettingsMenuItemClick(MenuItem item) {
+						// Called when the user clicks the settings option from the menu
+						// Return true to override default behavior
+						return false;
 					}
 				});
 			}
