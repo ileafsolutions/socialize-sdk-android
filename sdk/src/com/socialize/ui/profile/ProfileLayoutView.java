@@ -60,10 +60,14 @@ public class ProfileLayoutView extends BaseView {
 		}
 		       
 		
+		/**Code for Nexercise project Starts*/
 		if(!landscape) {
 			header = profileHeaderFactory.getBean();
+			header.hideMenu();
+			header.displayTitleImage();
 			addView(header);
 		}
+		/**Code for Nexercise project Ends*/
 		
 		content = profileContentViewFactory.getBean(this);
 		addView(content);

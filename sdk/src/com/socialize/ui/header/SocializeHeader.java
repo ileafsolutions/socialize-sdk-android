@@ -21,6 +21,7 @@
  */
 package com.socialize.ui.header;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -29,9 +30,13 @@ import android.graphics.drawable.LayerDrawable;
 import android.text.TextUtils.TruncateAt;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.LinearLayout.LayoutParams;
+
+import com.nexercise.client.android.R;
 import com.socialize.i18n.LocalizationService;
 import com.socialize.ui.util.Colors;
 import com.socialize.util.DisplayUtils;
@@ -52,7 +57,12 @@ public class SocializeHeader extends LinearLayout {
 	private LocalizationService localizationService;
 	private String headerTextKey;
 	private String headerText;
-
+	/**Code for Nexercise project Starts*/
+	private Activity mContext;
+	
+	
+	private ImageView menubarImage;	
+	/**Code for Nexercise project Ends*/
 	public void setHeaderText(String headerText) {
 		this.headerText = headerText;
 	}
@@ -71,6 +81,8 @@ public class SocializeHeader extends LinearLayout {
 
 	public SocializeHeader(Context context) {
 		super(context);
+		mContext = (Activity) context; //Code for Nexercise project
+
 	}
 
 	public TextView getTitleText() {
@@ -92,7 +104,21 @@ public class SocializeHeader extends LinearLayout {
 	public void setTitleImage(ImageView titleImage) {
 		this.titleImage = titleImage;
 	}
-
+	/**Code for Nexercise project Starts*/
+	public void displayMenu() {
+		this.menubarImage.setVisibility(View.VISIBLE);
+	}
+	public void hideMenu() {
+		this.menubarImage.setVisibility(View.GONE);
+	}
+	
+	public void displayTitleImage() {
+		this.titleImage.setVisibility(View.VISIBLE);
+	}
+	public void hideTitleImage() {
+		this.titleImage.setVisibility(View.GONE);
+	}
+	/**Code for Nexercise project Ends*/
 	public void init() {
 		int four = displayUtils.getDIP(4);
 		int eight = displayUtils.getDIP(8);
@@ -139,13 +165,40 @@ public class SocializeHeader extends LinearLayout {
 		titleImage.setImageDrawable(drawables.getDrawable("socialize_icon_white.png"));
 		titleImage.setPadding(0, 0, 0, 0);
 
+		/**Code for Nexercise project Starts*/
+		menubarImage = new ImageView(getContext());
+		menubarImage.setBackgroundResource(R.drawable.topbar_socialize_menu_btn_states);
+		menubarImage.setPadding(0, 0, 0, 0);
+
+		LayoutParams menubarImageLayoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		menubarImageLayoutParams.gravity = Gravity.CENTER_VERTICAL;
+		menubarImageLayoutParams.setMargins(four, 0, four, 0);
+		menubarImage.setLayoutParams(menubarImageLayoutParams);
+		menubarImage.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				mContext.openOptionsMenu();
+			}
+		});
+		
+		
+		titleImage = new ImageView(getContext());
+		titleImage.setImageDrawable(drawables.getDrawable("socialize_icon_white.png"));
+		titleImage.setPadding(0, 0, 0, 0);
+
 		LayoutParams titleImageLayoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 		titleImageLayoutParams.gravity = Gravity.CENTER_VERTICAL;
-		titleImageLayoutParams.setMargins(eight, 0, four, 0);
+		titleImageLayoutParams.setMargins(four, 0, four, 0);
 		titleImage.setLayoutParams(titleImageLayoutParams);
+		titleImage.setVisibility(View.GONE);
 
+		this.addView(menubarImage);
 		this.addView(titleImage);
 		this.addView(titleText);
+		
+		/**Code for Nexercise project Ends*/
 	}
 	
 	// So we can mock
