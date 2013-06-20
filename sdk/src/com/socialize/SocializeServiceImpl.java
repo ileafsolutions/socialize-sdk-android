@@ -236,6 +236,8 @@ public class SocializeServiceImpl implements SocializeService {
 			if(paths != null) {
 
 				if(isInitialized(context)) {
+
+
 					
 					if(localPaths != null) {
 						for (String path : paths) {
@@ -281,50 +283,45 @@ public class SocializeServiceImpl implements SocializeService {
 				}
 
 				if(init) {
-					try {
-						Logger.LOG_KEY = Socialize.LOG_KEY;
-						Logger.logLevel = Log.WARN;
-						
-						this.initPaths = paths;
+					Logger.LOG_KEY = Socialize.LOG_KEY;
+					Logger.logLevel = Log.WARN;
 
-						// JP:  Not sure why this sort was here.. but it seems wrong
-//						sort(this.initPaths);
-						
-						if(container == null) {
-							container = newSocializeIOC();
+					this.initPaths = paths;
+
+					// JP:  This sort is in the wrong place, should only be used when searching for new paths.
+//				    sort(this.initPaths);
+
+					if(container == null) {
+						container = newSocializeIOC();
+					}
+
+					ResourceLocator locator = newResourceLocator();
+
+					locator.setLogger(newLogger());
+
+					ClassLoaderProvider provider = newClassLoaderProvider();
+
+					locator.setClassLoaderProvider(provider);
+
+					if(logger != null) {
+
+						if(logger.isDebugEnabled()) {
+							for (String path : paths) {
+								logger.debug("Initializing Socialize with path [" +
+										path +
+										"]");
+							}
+
+							Logger.logLevel = Log.DEBUG;
 						}
+						else if(logger.isInfoEnabled()) {
+							Logger.logLevel = Log.INFO;
+						}
+					}
 
-						ResourceLocator locator = newResourceLocator();
-						
-						locator.setLogger(newLogger());
-						
-						ClassLoaderProvider provider = newClassLoaderProvider();
-						
-						locator.setClassLoaderProvider(provider);
-						
-						if(logger != null) {
-							
-							if(logger.isDebugEnabled()) {
-								for (String path : paths) {
-									logger.debug("Initializing Socialize with path [" +
-											path +
-											"]");
-								}
-								
-								Logger.logLevel = Log.DEBUG;
-							}
-							else if(logger.isInfoEnabled()) {
-								Logger.logLevel = Log.INFO;
-							}
-						}	
-						
-						((SocializeIOC) container).init(context, locator, paths);
-						
-						init(context, container, listener); // initCount incremented here
-					}
-					catch (Exception e) {
-						throw e;
-					}
+					((SocializeIOC) container).init(context, locator, paths);
+
+					init(context, container, listener); // initCount incremented here
 				}
 				else {
 					this.initCount++;
@@ -389,7 +386,13 @@ public class SocializeServiceImpl implements SocializeService {
 	
 	// So we can mock
 	protected int binarySearch(String[] array, String str) {
-		return Arrays.binarySearch(array, str);
+		// No longer a binary search because we don't want the list to be sorted as this distrubs the priority
+		for (int i = 0; i < array.length; i++) {
+			if(array[i].equals(str)) {
+				return i;
+			}
+		}
+		return -1;
 	}
 	
 	// So we can mock
@@ -409,6 +412,7 @@ public class SocializeServiceImpl implements SocializeService {
 		if(!isInitialized(context)) {
 			try {
 				this.container = container;
+				this.container.setContext(context);
 				
 				this.logger = container.getBean("logger");
 				
@@ -431,7 +435,7 @@ public class SocializeServiceImpl implements SocializeService {
 				mainConfig.merge(ConfigUtils.preInitConfig);
 				
 				this.config = mainConfig;
-				this.initCount++;
+				this.initCount=1;
 				
 				verify3rdPartyAuthConfigured();
 				
@@ -1033,6 +1037,10 @@ public class SocializeServiceImpl implements SocializeService {
 				public void onInit(Context ctx, IOCContainer container) {
 					// This is the current context
 					setContext(ctx);
+
+					if(appUtils != null) {
+						appUtils.onResume(ctx);
+					}
 					
 					if(FacebookUtils.isAvailable(ctx)) {
 						try {
@@ -1058,6 +1066,10 @@ public class SocializeServiceImpl implements SocializeService {
 			
 			// This is the current context
 			setContext(context);
+
+			if(appUtils != null) {
+				appUtils.onResume(context);
+			}
 		}
 	}
 	
