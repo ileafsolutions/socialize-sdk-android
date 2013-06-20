@@ -312,4 +312,11 @@ public class SocializeUserSystem extends SocializeApi<User, SocializeProvider<Us
 	public void setBitmapUtils(BitmapUtils bitmapUtils) {
 		this.bitmapUtils = bitmapUtils;
 	}
+
+	@Override
+	public void saveUserAsync(Context context, SocializeSession session,
+			User user, UserListener listener) {
+		// TODO Auto-generated method stub
+		
+	}
 }
