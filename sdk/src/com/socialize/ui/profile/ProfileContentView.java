@@ -50,6 +50,7 @@ import com.socialize.ui.view.SocializeEditText;
 import com.socialize.util.AppUtils;
 import com.socialize.util.DisplayUtils;
 import com.socialize.util.Drawables;
+import com.socialize.util.SafeBitmapDrawable;
 import com.socialize.view.BaseView;
 
 /**
@@ -445,7 +446,7 @@ public class ProfileContentView extends BaseView {
 	}
 
 	public void onProfilePictureChange(Bitmap image) {
-		profilePictureEditView.setProfileImage(new BitmapDrawable(image));
+		profilePictureEditView.setProfileImage(new SafeBitmapDrawable(image));
 	}
 
 	public User getCurrentUser() {
