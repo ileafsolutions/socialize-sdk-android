@@ -34,8 +34,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.LinearLayout.LayoutParams;
 
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.nexercise.client.android.R;
 import com.socialize.i18n.LocalizationService;
 import com.socialize.ui.util.Colors;
@@ -59,7 +59,7 @@ public class SocializeHeader extends LinearLayout {
 	private String headerText;
 	/**Code for Nexercise project Starts*/
 	private Activity mContext;
-	
+	SlidingMenu menu;
 	
 	private ImageView menubarImage;	
 	/**Code for Nexercise project Ends*/
@@ -122,7 +122,7 @@ public class SocializeHeader extends LinearLayout {
 	public void init() {
 		int four = displayUtils.getDIP(4);
 		int eight = displayUtils.getDIP(8);
-		int height = displayUtils.getDIP(57);
+		int height = displayUtils.getDIP(59); // Code added for Nexercise project
 		
 		LayoutParams titlePanelLayoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, height);
 		titlePanelLayoutParams.gravity = Gravity.CENTER_VERTICAL;
@@ -179,14 +179,12 @@ public class SocializeHeader extends LinearLayout {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				mContext.openOptionsMenu();
+				if (getSlidingMenu() != null) {
+					menu.showMenu();
+				}
 			}
 		});
 		
-		
-		titleImage = new ImageView(getContext());
-		titleImage.setImageDrawable(drawables.getDrawable("socialize_icon_white.png"));
-		titleImage.setPadding(0, 0, 0, 0);
 
 		LayoutParams titleImageLayoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 		titleImageLayoutParams.gravity = Gravity.CENTER_VERTICAL;
@@ -217,4 +215,14 @@ public class SocializeHeader extends LinearLayout {
 	public void setLocalizationService(LocalizationService localizationService) {
 		this.localizationService = localizationService;
 	}
+	
+	/**Code for Nexercise project Starts*/
+	public void setSlidingMenu(SlidingMenu slidingMenu) {
+		this.menu = slidingMenu;
+	}
+
+	public SlidingMenu getSlidingMenu() {
+		return this.menu;
+	}
+	/**Code for Nexercise project Ends*/
 }

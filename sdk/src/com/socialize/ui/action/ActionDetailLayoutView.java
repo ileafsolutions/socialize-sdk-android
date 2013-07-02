@@ -27,6 +27,8 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+
+import com.nexercise.client.android.helpers.NxrSocializeMenuHelper;
 import com.socialize.CommentUtils;
 import com.socialize.Socialize;
 import com.socialize.UserUtils;
@@ -74,6 +76,8 @@ public class ActionDetailLayoutView extends BaseView {
 	private ImageLoader imageLoader;
 	private ListenerHolder listenerHolder;
 	// End injected
+	/**Code for Nexercise project Starts*/	
+	NxrSocializeMenuHelper mMenuHelper;
 	
 	public ActionDetailLayoutView(Activity context, String userId) {
 		this(context);
@@ -264,6 +268,9 @@ public class ActionDetailLayoutView extends BaseView {
 				content.setUserBio(user.getDescription());
 			}
 		}
+		if(getSlidingMenuHelper() != null){
+			content.setSlidingMenuHelper(getSlidingMenuHelper());
+		}
 		/**Code for Nexercise project Ends*/
 	}
 	
@@ -305,4 +312,13 @@ public class ActionDetailLayoutView extends BaseView {
 	public ActionDetailContentView getContent() {
 		return content;
 	}
+	
+	/**Nexercise  Custom Slide menu changes starts */
+	public void setSlidingMenuHelper(NxrSocializeMenuHelper  menuHelper) {
+		this.mMenuHelper = menuHelper;
+	}
+	public NxrSocializeMenuHelper getSlidingMenuHelper() {
+		return mMenuHelper;
+	}
+	/**Nexercise  Custom Slide menu changes ends */
 }

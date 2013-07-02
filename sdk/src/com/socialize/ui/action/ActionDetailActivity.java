@@ -21,16 +21,37 @@
  */
 package com.socialize.ui.action;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import android.app.Dialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.View;
+import android.widget.ListView;
+
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu.OnOpenListener;
+import com.nexercise.client.android.NexerciseApplication;
+import com.nexercise.client.android.R;
+import com.nexercise.client.android.adapters.SlideMenuAdapter;
+import com.nexercise.client.android.constants.MenuConstants;
+import com.nexercise.client.android.entities.Friend;
+import com.nexercise.client.android.entities.NXRMenuItem;
+import com.nexercise.client.android.helpers.NxrSocializeMenuHelper;
+import com.nexercise.client.android.utils.FriendDialogUtils;
+import com.nexercise.client.android.utils.FriendDialogUtils.FriendCallbacks;
 import com.socialize.CommentUtils;
 import com.socialize.Socialize;
 import com.socialize.SocializeService;
+import com.socialize.UserUtils;
 import com.socialize.api.SocializeSession;
 import com.socialize.entity.SocializeAction;
 import com.socialize.entity.User;
+import com.socialize.error.SocializeException;
 import com.socialize.ui.SocializeUIActivity;
 
 /**
@@ -39,11 +60,22 @@ import com.socialize.ui.SocializeUIActivity;
 public class ActionDetailActivity extends SocializeUIActivity {
 
 	private ActionDetailView view;
+	/**Code for Nexercise project Starts*/	
+	NxrSocializeMenuHelper mMenuHelper;
+	SlideMenuAdapter mCustomMenuAdapter;
+	ListView mListViewSlideMenu;
+	List<NXRMenuItem> mCustomMenuList;	
+    private static final int DIALOG_ADD_FRIEND= 0;
+    private static final int DIALOG_REMOVE_FRIEND= 1;
 
+    private Boolean isFriend;
+    
+    /**Code for Nexercise project Ends*/
 	@Override
 	protected void onCreateSafe(Bundle savedInstanceState) {
 		Intent intent = getIntent();
 		doActivityLoad(intent);
+		new GetIsFriendTask().execute(); //Nexercise Custom Slide menu
 	}
 
 	@Override
@@ -70,6 +102,9 @@ public class ActionDetailActivity extends SocializeUIActivity {
 			else {
 				view = new ActionDetailView(this);
 				setContentView(view);
+				 /**Code for Nexercise project Starts*/
+				initSlideMenu();
+				 /**Code for Nexercise project Ends*/
 			}
 		}	
 	}
@@ -96,16 +131,222 @@ public class ActionDetailActivity extends SocializeUIActivity {
 		}
 		return super.onKeyDown(keyCode, event);
 	}
-
-	@Override
+	/** Nexercise Custom Slide menu changes starts */
+/*	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		if(view != null) {
 			return view.onCreateOptionsMenu(this, menu);
 		}
 		return false;
-	}
-
+	}*/
+	/** Nexercise Custom Slide menu changes ends */
 	protected SocializeService getSocialize() {
 		return Socialize.getSocialize();
 	}
+	
+	/**Nexercise Custom Slide menu changes starts */
+	public void initSlideMenu() {
+		mMenuHelper = new NxrSocializeMenuHelper(this);
+		mCustomMenuList = mMenuHelper.getMenuList();
+		if(isFriend != null && !isFriend){
+			mCustomMenuList.add(new NXRMenuItem(R.id.custom_menu_add_friend,
+					MenuConstants.MENU_ADD_FRIEND, 1,
+					R.drawable.icon_custom_add_friend,
+					new View.OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							// TODO Auto-generated method stub
+				            showDialog(DIALOG_ADD_FRIEND);
+							if (mMenuHelper.getSlidingMenu().isMenuShowing()) {
+								mMenuHelper.getSlidingMenu().showContent();
+							}
+						}
+					}));
+		}
+		if(isFriend != null && isFriend){
+			mCustomMenuList.add(new NXRMenuItem(R.id.custom_menu_remove_friend,
+					MenuConstants.MENU_REMOVE_FRIEND, 1,
+					R.drawable.icon_custom_remove_friend,
+					new View.OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							// TODO Auto-generated method stub
+							showDialog(DIALOG_REMOVE_FRIEND);
+							if (mMenuHelper.getSlidingMenu().isMenuShowing()) {
+								mMenuHelper.getSlidingMenu().showContent();
+							}
+						}
+					}));
+		}
+		mCustomMenuAdapter = new SlideMenuAdapter(this, mCustomMenuList);
+		Collections.sort(mCustomMenuList);
+		mListViewSlideMenu = (ListView) findViewById(R.id.list_view_menu);
+		mListViewSlideMenu.setAdapter(mCustomMenuAdapter);
+		mCustomMenuAdapter.notifyDataSetChanged();
+		mMenuHelper.getSlidingMenu().setOnOpenListener(new OnOpenListener() {
+			
+			@Override
+			public void onOpen() {
+				// TODO Auto-generated method stub
+			}
+		});
+		if(view != null){
+			view.setSlidingMenuHelper(mMenuHelper);
+		}
+	}
+	
+
+	/**Nexercise  Custom Slide menu changes ends */
+	
+/**********************Code for Nexercise project Starts***************************/
+	
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+		if (mMenuHelper.getSlidingMenu() != null) {
+			mMenuHelper.getSlidingMenu().toggle();
+		}
+        updateMenu();
+        return false;
+    }
+
+
+    @Override
+    protected Dialog onCreateDialog(int id) {
+        String socializeId= getIntent().getStringExtra(Socialize.USER_ID);
+        switch (id) {
+            case DIALOG_ADD_FRIEND:
+                return FriendDialogUtils.getAddFriendDialog(this, socializeId, new SocializeFriendCallbacks() {
+                    public void onPostExecute(Boolean result) {
+                        isFriend= result;
+                        updateMenu();
+                    }
+                });
+            case DIALOG_REMOVE_FRIEND:
+                return FriendDialogUtils.getRemoveFriendDialog(this, getFriend(socializeId).userID, new SocializeFriendCallbacks() {
+                    public void onPostExecute(Boolean result) {
+                        isFriend= !result;
+                        updateMenu();
+                    }
+                });
+            default:
+                return super.onCreateDialog(id);
+        }
+    }
+
+    private Friend getFriend(String socializeId) {
+        if (socializeId != null) {
+            ArrayList<Friend> list= ((NexerciseApplication)
+                    getApplication()).getDataLayerInstance().getExerciseFriendsList();
+            for (Friend friend : list) {
+                if (friend != null && socializeId.equals(friend.socializeID)) {
+                    return friend;
+                }
+            }
+        }
+        return null;
+    }
+
+    private void updateMenu() {
+    		String UserId = null;
+    		try {
+				UserId = UserUtils.getCurrentUser(this).getId().toString();
+			} catch (SocializeException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+ 			if (UserId.equals(getIntent().getStringExtra(Socialize.USER_ID))){
+ 				mMenuHelper.removefromMenuItem(R.id.custom_menu_add_friend);
+ 				mMenuHelper.removefromMenuItem(R.id.custom_menu_remove_friend);
+			} else {
+				if(isFriend != null && !isFriend){
+					mMenuHelper.removefromMenuItem(R.id.custom_menu_add_friend);
+					mCustomMenuList.add(new NXRMenuItem(R.id.custom_menu_add_friend,
+							MenuConstants.MENU_ADD_FRIEND, 1,
+							R.drawable.icon_custom_add_friend,
+							new View.OnClickListener() {
+								@Override
+								public void onClick(View v) {
+									// TODO Auto-generated method stub
+						            showDialog(DIALOG_ADD_FRIEND);
+									if (mMenuHelper.getSlidingMenu().isMenuShowing()) {
+										mMenuHelper.getSlidingMenu().showContent();
+									}
+								}
+							}));
+				}
+				if(isFriend != null && isFriend){
+					mMenuHelper.removefromMenuItem(R.id.custom_menu_remove_friend);
+					mCustomMenuList.add(new NXRMenuItem(R.id.custom_menu_remove_friend,
+							MenuConstants.MENU_REMOVE_FRIEND, 1,
+							R.drawable.icon_custom_remove_friend,
+							new View.OnClickListener() {
+								@Override
+								public void onClick(View v) {
+									// TODO Auto-generated method stub
+									showDialog(DIALOG_REMOVE_FRIEND);
+									if (mMenuHelper.getSlidingMenu().isMenuShowing()) {
+										mMenuHelper.getSlidingMenu().showContent();
+									}
+								}
+							}));
+				}
+			}
+    }
+
+    private abstract class SocializeFriendCallbacks implements FriendCallbacks {
+
+        @Override
+        public void onPreExecute() {
+            isFriend= null;
+            updateMenu();
+        }
+    }
+
+    private class GetIsFriendTask extends AsyncTask<Void, Void, Boolean> {
+
+        private String mUserId;
+
+        @Override
+        protected final void onPreExecute() {
+            super.onPreExecute();
+            mUserId= getIntent().getStringExtra(Socialize.USER_ID);
+            if (mUserId == null) {
+                cancel(true);
+            } else {
+                isFriend= null;
+                updateMenu();
+            }
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            if (mUserId != null) {
+                ArrayList<Friend> list= ((NexerciseApplication)
+                        getApplication()).getDataLayerInstance().getExerciseFriendsList();
+                for (Friend friend : list) {
+                    if (friend != null && mUserId.equals(friend.socializeID)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+            isFriend= result;
+            updateMenu();
+        }
+    }
+	@Override
+	public void onBackPressed() {
+		if (mMenuHelper.getSlidingMenu().isMenuShowing()) {
+			mMenuHelper.getSlidingMenu().showContent();
+		} else {
+			super.onBackPressed();
+		}
+	}
+    /**Code for Nexercise project Ends*/
 }

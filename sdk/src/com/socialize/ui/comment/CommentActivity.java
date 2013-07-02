@@ -21,10 +21,27 @@
  */
 package com.socialize.ui.comment;
 
+import java.util.Collections;
+import java.util.List;
+
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.*;
+import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.ListView;
+import android.widget.Toast;
+
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu.OnOpenListener;
+import com.nexercise.client.android.R;
+import com.nexercise.client.android.adapters.SlideMenuAdapter;
+import com.nexercise.client.android.constants.MenuConstants;
+import com.nexercise.client.android.entities.NXRMenuItem;
+import com.nexercise.client.android.helpers.NxrSocializeMenuHelper;
+import com.nexercise.client.android.utils.Funcs;
 import com.socialize.Socialize;
 import com.socialize.log.SocializeLogger;
 import com.socialize.ui.SocializeUIActivity;
@@ -38,6 +55,12 @@ import com.socialize.util.DefaultAppUtils;
 public class CommentActivity extends SocializeUIActivity {
 	
 	private CommentView view;
+	/** Nexercise Custom Slide menu changes starts */
+	NxrSocializeMenuHelper mMenuHelper;
+	SlideMenuAdapter mCustomMenuAdapter;
+	ListView mListViewSlideMenu;
+	List<NXRMenuItem> mCustomMenuList;
+	/** Nexercise Custom Slide menu changes ends */
 	
 	@Override
 	protected void onCreateSafe(Bundle savedInstanceState) {
@@ -56,7 +79,10 @@ public class CommentActivity extends SocializeUIActivity {
 			}
 			else {
 				view = new CommentView(this);
-				setContentView(view);	
+				setContentView(view);
+				/** Nexercise Custom Slide menu changes starts */
+				initSlideMenu();
+				/** Nexercise Custom Slide menu changes ends */
 			}
 		}
 	}
@@ -89,14 +115,16 @@ public class CommentActivity extends SocializeUIActivity {
 			view.onProfileUpdate();
 		}
 	}
-
+	/** Nexercise Custom Slide menu changes starts */
+	/*
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		if(view != null) {
 			return view.onCreateOptionsMenu(this, menu);
 		}
 		return false;
-	}
+	}*/
+	/** Nexercise Custom Slide menu changes Ends */
 	
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
@@ -111,5 +139,63 @@ public class CommentActivity extends SocializeUIActivity {
 			return view.onContextItemSelected(this, item);
 		}		
 		return super.onContextItemSelected(item);
-	}	
+	}
+	/** Nexercise Custom Slide menu changes starts */
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+		if (mMenuHelper.getSlidingMenu() != null) {
+			mMenuHelper.getSlidingMenu().toggle();
+		}
+        return false;
+    }
+	public void initSlideMenu() {
+		mMenuHelper = new NxrSocializeMenuHelper(this);
+		mCustomMenuList = mMenuHelper.getMenuList();
+		mMenuHelper.removefromMenuItem(R.id.custom_menu_refresh);
+		mCustomMenuList.add(new NXRMenuItem(R.id.custom_menu_refresh,
+				MenuConstants.MENU_REFRESH, 2,
+				R.drawable.ic_custom_menu_refresh, new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						// TODO Auto-generated method stub
+						if (mMenuHelper.getSlidingMenu().isMenuShowing()) {
+							mMenuHelper.getSlidingMenu().showContent();
+						}
+						if (Funcs.isInternetReachable(CommentActivity.this)) {
+							if(view != null){
+								view.reload();
+							}
+						} else {
+							Toast.makeText(getApplicationContext(),
+									"No connection available",
+									Toast.LENGTH_SHORT).show();
+						}
+					}
+				}));
+		mCustomMenuAdapter = new SlideMenuAdapter(this, mCustomMenuList);
+		Collections.sort(mCustomMenuList);
+		mListViewSlideMenu = (ListView) findViewById(R.id.list_view_menu);
+		mListViewSlideMenu.setAdapter(mCustomMenuAdapter);
+		mCustomMenuAdapter.notifyDataSetChanged();
+		mMenuHelper.getSlidingMenu().setOnOpenListener(new OnOpenListener() {
+			
+			@Override
+			public void onOpen() {
+				// TODO Auto-generated method stub
+			}
+		});
+		if(view != null){
+			view.setSlidingMenu(mMenuHelper.getSlidingMenu());
+		}
+	}
+	
+	@Override
+	public void onBackPressed() {
+		if (mMenuHelper.getSlidingMenu().isMenuShowing()) {
+			mMenuHelper.getSlidingMenu().showContent();
+		} else {
+			super.onBackPressed();
+		}
+	}
+	/** Nexercise Custom Slide menu changes  ends */
 }

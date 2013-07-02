@@ -14,6 +14,8 @@ import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Toast;
+
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.socialize.CommentUtils;
 import com.socialize.Socialize;
 import com.socialize.android.ioc.IOCContainer;
@@ -36,6 +38,7 @@ public class CommentView extends EntityView {
 	private Entity entity;
 	private SocializeConfig config;
 	private OnCommentViewActionListener onCommentViewActionListener;
+	SlidingMenu menu;
 	
 	public static final String COMMENT_LISTENER = "socialize.comment.listener";
 	
@@ -62,6 +65,11 @@ public class CommentView extends EntityView {
 				config = container.getBean("config");
 				commentListView.setEntity(entity);
 				commentListView.setHeaderDisplayed(headerDisplayed);
+				 /**Code for Nexercise project Starts*/
+				if(getSlidingMenu() != null){
+					commentListView.setSlidingMenu(getSlidingMenu());
+				}
+				 /**Code for Nexercise project Ends*/
 				ListenerHolder holder = container.getBean("listenerHolder");
 				if(holder != null) {
 					onCommentViewActionListener = holder.pop(COMMENT_LISTENER);
@@ -252,4 +260,14 @@ public class CommentView extends EntityView {
 		
 		return false;
 	}
+	
+	
+	/**Code for Nexercise project STarts*/
+	public void setSlidingMenu(SlidingMenu slidingMenu) {
+		this.menu = slidingMenu;
+	}
+	public SlidingMenu getSlidingMenu() {
+		return this.menu;
+	}
+	/**Code for Nexercise project Ends*/
 }

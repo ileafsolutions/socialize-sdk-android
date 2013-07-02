@@ -44,6 +44,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.nexercise.client.android.R;
+import com.nexercise.client.android.helpers.NxrSocializeMenuHelper;
 import com.socialize.android.ioc.IBeanFactory;
 import com.socialize.entity.SocializeAction;
 import com.socialize.entity.User;
@@ -84,9 +85,10 @@ public class ActionDetailContentView extends BaseView {
 	
 	private IBeanFactory<UserActivityView> userActivityViewFactory;
 	private UserActivityView userActivityView;
-	
+
 	/**Code for Nexercise project Starts*/
 	private Activity mContext;
+	NxrSocializeMenuHelper mMenuHelper;
 	/**Code for Nexercise project Ends*/
 	public ActionDetailContentView(Context context) {
 		super(context);
@@ -193,7 +195,9 @@ public class ActionDetailContentView extends BaseView {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				mContext.openOptionsMenu();
+				if(getSlidingMenuHelper().getSlidingMenu() != null){
+					getSlidingMenuHelper().getSlidingMenu().toggle();
+				}
 			}
 		});
 		
@@ -440,6 +444,12 @@ public class ActionDetailContentView extends BaseView {
 				}
 			});
 		}
+	}
+	public void setSlidingMenuHelper(NxrSocializeMenuHelper  menuHelper) {
+		this.mMenuHelper = menuHelper;
+	}
+	public NxrSocializeMenuHelper getSlidingMenuHelper() {
+		return mMenuHelper;
 	}
 	/**Code for Nexercise project Ends*/
 }

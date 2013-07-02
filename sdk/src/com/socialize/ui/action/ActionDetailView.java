@@ -26,6 +26,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
+import com.nexercise.client.android.helpers.NxrSocializeMenuHelper;
 import com.socialize.Socialize;
 import com.socialize.entity.SocializeAction;
 import com.socialize.log.SocializeLogger;
@@ -38,7 +41,9 @@ import com.socialize.util.Drawables;
 public class ActionDetailView extends EntityView {
 
 	private ActionDetailLayoutView actionLayoutView;
-
+	/**Code for Nexercise project */	
+	NxrSocializeMenuHelper mMenuHelper;
+	
 	private View view;
 	
 	public ActionDetailView(Context context) {
@@ -69,7 +74,11 @@ public class ActionDetailView extends EntityView {
 				layout.setBackgroundDrawable(((Drawables)container.getBean("drawables")).getDrawable("slate.png", true, true, true));
 				
 				layout.addView(scrollView);
-				
+				/**Nexercise  Custom Slide menu changes starts */
+				if(getSlidingMenuHelper() != null){
+					actionLayoutView.setSlidingMenuHelper(getSlidingMenuHelper());
+				}
+				/**Nexercise  Custom Slide menu changes ends */
 				view = layout;
 			}
 			
@@ -111,4 +120,12 @@ public class ActionDetailView extends EntityView {
 	public View getLoadingView() {
 		return null;
 	}
+	/**Nexercise  Custom Slide menu changes starts */
+	public void setSlidingMenuHelper(NxrSocializeMenuHelper  menuHelper) {
+		this.mMenuHelper = menuHelper;
+	}
+	public NxrSocializeMenuHelper getSlidingMenuHelper() {
+		return mMenuHelper;
+	}
+	/**Nexercise  Custom Slide menu changes ends */
 }

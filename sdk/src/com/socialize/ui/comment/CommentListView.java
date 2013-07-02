@@ -1,5 +1,7 @@
 package com.socialize.ui.comment;
 
+import java.util.List;
+
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.view.View;
@@ -7,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.nexercise.client.android.NexerciseApplication;
 import com.nexercise.client.android.constants.SocializeConstants;
 import com.nexercise.client.android.entities.UserInfo;
@@ -19,7 +22,11 @@ import com.socialize.api.action.comment.CommentUtilsProxy;
 import com.socialize.api.action.comment.SubscriptionUtilsProxy;
 import com.socialize.api.action.user.UserUtilsProxy;
 import com.socialize.config.SocializeConfig;
-import com.socialize.entity.*;
+import com.socialize.entity.Comment;
+import com.socialize.entity.Entity;
+import com.socialize.entity.ListResult;
+import com.socialize.entity.Subscription;
+import com.socialize.entity.User;
 import com.socialize.error.SocializeException;
 import com.socialize.i18n.I18NConstants;
 import com.socialize.listener.comment.CommentAddListener;
@@ -37,10 +44,12 @@ import com.socialize.ui.slider.ActionBarSliderFactory.ZOrder;
 import com.socialize.ui.slider.ActionBarSliderView;
 import com.socialize.ui.view.CustomCheckbox;
 import com.socialize.ui.view.LoadingListView;
-import com.socialize.util.*;
+import com.socialize.util.AppUtils;
+import com.socialize.util.CacheableDrawable;
+import com.socialize.util.DisplayUtils;
+import com.socialize.util.Drawables;
+import com.socialize.util.StringUtils;
 import com.socialize.view.BaseView;
-
-import java.util.List;
 
 public class CommentListView extends BaseView {
 
@@ -94,7 +103,8 @@ public class CommentListView extends BaseView {
 	
 	/**Code for Nexercise project Starts*/
 	UserInfo userInfo;
-	
+	SlidingMenu menu;
+
 	boolean isDeveloper = false;
 	/**Code for Nexercise project Ends*/
 	
@@ -955,8 +965,18 @@ public class CommentListView extends BaseView {
 			}
 		}
 	}
+
+	/**Code for Nexercise project STarts*/
+	public void setSlidingMenu(SlidingMenu slidingMenu) {
+		this.menu = slidingMenu;
+		if(header != null) {
+			header.setSlidingMenu(menu);
+		}
+	}
+	
 	private DataLayer getDataLayer() {
 		return ((NexerciseApplication) getActivity().getApplication())
 				.getDataLayerInstance();
 	}
+	/**Code for Nexercise project Ends*/
 }

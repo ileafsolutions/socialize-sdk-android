@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.widget.LinearLayout;
+
 import com.socialize.UserUtils;
 import com.socialize.android.ioc.IBeanFactory;
 import com.socialize.entity.User;
