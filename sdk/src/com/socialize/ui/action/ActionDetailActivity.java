@@ -178,7 +178,7 @@ public class ActionDetailActivity extends SocializeUIActivity {
 						}
 					}));
 		}
-		mCustomMenuAdapter = new SlideMenuAdapter(this, mCustomMenuList);
+		mCustomMenuAdapter = new SlideMenuAdapter(this, mCustomMenuList,true);
 		Collections.sort(mCustomMenuList);
 		mListViewSlideMenu = (ListView) findViewById(R.id.list_view_menu);
 		mListViewSlideMenu.setAdapter(mCustomMenuAdapter);

@@ -154,7 +154,7 @@ public class CommentActivity extends SocializeUIActivity {
 		mMenuHelper.removefromMenuItem(R.id.custom_menu_refresh);
 		mCustomMenuList.add(new NXRMenuItem(R.id.custom_menu_refresh,
 				MenuConstants.MENU_REFRESH, 2,
-				R.drawable.ic_custom_menu_refresh, new View.OnClickListener() {
+				R.drawable.ic_menu_refresh, new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
 						// TODO Auto-generated method stub
@@ -172,7 +172,7 @@ public class CommentActivity extends SocializeUIActivity {
 						}
 					}
 				}));
-		mCustomMenuAdapter = new SlideMenuAdapter(this, mCustomMenuList);
+		mCustomMenuAdapter = new SlideMenuAdapter(this, mCustomMenuList,true);
 		Collections.sort(mCustomMenuList);
 		mListViewSlideMenu = (ListView) findViewById(R.id.list_view_menu);
 		mListViewSlideMenu.setAdapter(mCustomMenuAdapter);
