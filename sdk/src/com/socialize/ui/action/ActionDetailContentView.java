@@ -101,6 +101,7 @@ public class ActionDetailContentView extends BaseView {
 		
 		final int imagePadding = displayUtils.getDIP(4);
 		final int margin = displayUtils.getDIP(8);
+		final int marginLarge = displayUtils.getDIP(200);//Code for Nexercise project
 		final int actionMargin = displayUtils.getDIP(4);
 		final int imageSize = displayUtils.getDIP(64);
 		final int editTextStroke = displayUtils.getDIP(2);
@@ -127,24 +128,27 @@ public class ActionDetailContentView extends BaseView {
 		/**Code for Nexercise project Starts*/
 		
 		RelativeLayout menuLayout = new RelativeLayout(getContext());
-		RelativeLayout.LayoutParams menuLayoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
-		menuLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+		RelativeLayout.LayoutParams menuLayoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.FILL_PARENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
+		menuLayoutParams.setMargins(0, 0, margin, 0);
+		menuLayout.setPadding(padding, 0, padding,0 );
 		menuLayout.setLayoutParams(menuLayoutParams);
 		
 		/**Code for Nexercise project Ends*/
 		
 		LinearLayout nameLayout = new LinearLayout(getContext());
-		LayoutParams nameLayoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
-		
+		LayoutParams nameLayoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT);
+		nameLayoutParams.setMargins(0, 0, marginLarge, 0);
+		nameLayout.setPadding(0, 0, padding,0 );
 		nameLayout.setLayoutParams(nameLayoutParams);
 		nameLayout.setOrientation(LinearLayout.VERTICAL);
 		nameLayout.setGravity(Gravity.TOP);
 		
 		LayoutParams imageLayout = new LinearLayout.LayoutParams(imageSize,imageSize);
 		
-		LayoutParams displayNameTextLayoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
+		LayoutParams displayNameTextLayoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT);
 		/**Code for Nexercise project Starts*/
 		android.widget.RelativeLayout.LayoutParams menubarImageLayoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
+
 		/**Code for Nexercise project Ends*/
 		LayoutParams actionLocationLineLayout = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
 		LayoutParams actionLocationLayout = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -156,8 +160,7 @@ public class ActionDetailContentView extends BaseView {
 		menubarImageLayoutParams.setMargins(margin, margin, margin, margin);
 		/**Code for Nexercise project Ends*/
 		displayNameTextLayoutParams.setMargins(0, margin, margin, margin);
-		
-		displayNameTextLayoutParams.weight = 1.0f;
+		//displayNameTextLayoutParams.weight = 1.0f;
 		/**Code for Nexercise project Starts*/
 		menubarImageLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 		/**Code for Nexercise project Ends*/
@@ -235,6 +238,7 @@ public class ActionDetailContentView extends BaseView {
 		displayName.setMaxLines(1);
 		displayName.setTypeface(Typeface.DEFAULT);
 		displayName.setSingleLine();
+		displayName.setPadding(padding, 0, padding, 0);
 		displayName.setLayoutParams(displayNameTextLayoutParams);
 	
 		/**Code for Nexercise project Starts*/
@@ -256,13 +260,15 @@ public class ActionDetailContentView extends BaseView {
 		
 		InputFilter[] maxLength = new InputFilter[1]; 
 		maxLength[0] = new InputFilter.LengthFilter(128); 
-		menuLayout.addView(menubarImage); //Code for Nexercise project
-
 		nameLayout.addView(displayName);
 		nameLayout.addView(actionLocationLine);
 		
+		menuLayout.addView(nameLayout);//Code for Nexercise project
+		menuLayout.addView(menubarImage); //Code for Nexercise project
+
+		
 		headerView.addView(profilePicture);
-		headerView.addView(nameLayout);
+		//headerView.addView(nameLayout);//Code for Nexercise project
 		headerView.addView(menuLayout);//Code for Nexercise project
 		
 		bioView.addView(userBio);//Code for Nexercise project
